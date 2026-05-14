@@ -1,91 +1,90 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { internshipService } from '../services/internship.service';
+import type { Internship, MasterLocation } from '../types';
 import styles from './LowonganPage.module.css';
 
-const jobListings = [
-  {
-    id: 1,
-    initial: 'G',
-    color: '#4f46e5',
-    title: 'Software Engineer Internship',
-    company: 'Glints Indonesia',
-    verified: true,
-    type: 'Internship',
-    duration: '3-6 Bulan',
-    location: 'Jakarta Selatan, DKI Jakarta (Remote)',
-    tags: ['React.js', 'Node.js', 'Tailwind CSS', '+5'],
-    match: 90,
-    urgent: true,
-    posted: 'Diupload 2 jam yang lalu',
-  },
-  {
-    id: 2,
-    initial: 'S',
-    color: '#f97316',
-    title: 'UI/UX Designer Apprentice',
-    company: 'Shopee Indonesia',
-    verified: true,
-    type: 'Internship',
-    duration: '6-12 Bulan',
-    location: 'Jakarta Pusat, DKI Jakarta',
-    tags: ['Figma', 'UX Research', '+2'],
-    match: 92,
-    urgent: false,
-    posted: 'Diupload 4 jam yang lalu',
-  },
-  {
-    id: 3,
-    initial: 'T',
-    color: '#3b82f6',
-    title: 'Marketing Strategy Intern',
-    company: 'Traveloka',
-    verified: true,
-    type: 'Internship',
-    duration: '3 Bulan',
-    location: 'Sleman, DIY (Hybrid)',
-    tags: [],
-    match: 85,
-    urgent: false,
-    posted: 'Diupload 1 hari yang lalu',
-  },
-  {
-    id: 4,
-    initial: 'G',
-    color: '#22c55e',
-    title: 'Content Creator Internship',
-    company: 'Gojek',
-    verified: true,
-    type: 'Internship',
-    duration: '4-6 Bulan',
-    location: 'Jakarta Selatan, DKI Jakarta',
-    tags: [],
-    match: 95,
-    urgent: true,
-    posted: 'Diupload 6 jam yang lalu',
-  },
-];
+// Warna avatar berdasarkan huruf pertama
+const avatarColors = ['#4f46e5', '#f97316', '#3b82f6', '#22c55e', '#ef4444', '#8b5cf6', '#0ea5e9', '#ec4899'];
+function getColor(name: string) {
+  return avatarColors[name.charCodeAt(0) % avatarColors.length];
+}
+
+// Format tanggal relatif
+function timeAgo(dateStr: string) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  if (hours < 1) return 'Baru saja';
+  if (hours < 24) return `Diupload ${hours} jam yang lalu`;
+  const days = Math.floor(hours / 24);
+  return `Diupload ${days} hari yang lalu`;
+}
 
 export function LowonganPage() {
+  const [internships, setInternships] = useState<Internship[]>([]);
+  const [locations, setLocations] = useState<MasterLocation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [locationFilter, setLocationFilter] = useState('');
+  const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
+
+  // Suggestions berdasarkan input
+  const locationSuggestions = locations.filter((loc) =>
+    !locationFilter || loc.name.toLowerCase().includes(locationFilter.toLowerCase())
+  );
+
+  // Fetch data dari API
+  const fetchInternships = async () => {
+    setIsLoading(true);
+    setError('');
+    try {
+      const response = await internshipService.getAll();
+      setInternships(response.data);
+    } catch {
+      setError('Gagal memuat data lowongan. Periksa koneksi internet Anda.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fetch master lokasi (dengan cache di sessionStorage)
+  const fetchLocations = async () => {
+    const cached = sessionStorage.getItem('master_locations');
+    if (cached) {
+      setLocations(JSON.parse(cached));
+      return;
+    }
+    try {
+      const response = await internshipService.getLocations();
+      setLocations(response.data);
+      sessionStorage.setItem('master_locations', JSON.stringify(response.data));
+    } catch {
+      // Gagal fetch lokasi — biarkan dropdown kosong
+    }
+  };
+
+  useEffect(() => {
+    fetchInternships();
+    fetchLocations();
+  }, []);
+
+  // Filter client-side
+  const filtered = internships.filter((job) => {
+    const query = searchQuery.toLowerCase();
+    const matchesSearch = !query ||
+      job.title.toLowerCase().includes(query) ||
+      job.company.toLowerCase().includes(query) ||
+      job.skills.some(s => s.skill.name.toLowerCase().includes(query));
+
+    const matchesLocation = !locationFilter ||
+      job.location.toLowerCase().includes(locationFilter.toLowerCase());
+
+    return matchesSearch && matchesLocation;
+  });
+
   return (
     <div className={styles.page}>
-      {/* Navbar */}
-      <nav className={styles.navbar}>
-        <div className={styles.navContainer}>
-          <Link to="/" className={styles.logo}>
-            <span className={styles.logoText}>Magang-in</span>
-            <span className={styles.logoDot}></span>
-          </Link>
-          <ul className={styles.navLinks}>
-            <li><Link to="/lowongan" className={styles.navLinkActive}>Lowongan</Link></li>
-              <li><Link to="/perusahaan">Perusahaan</Link></li>
-            <li><a href="#" className={styles.navLink}>Roadmaps</a></li>
-          </ul>
-          <div className={styles.navRight}>
-            <Link to="/login" className={styles.navMasuk}>Masuk</Link>
-            <Link to="/login" className={styles.navDaftar}>Daftar</Link>  
-          </div>
-        </div>
-      </nav>
-
       {/* Search Bar */}
       <div className={styles.searchSection}>
         <div className={styles.searchContainer}>
@@ -94,14 +93,81 @@ export function LowonganPage() {
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <input type="text" placeholder="Cari Nama Pekerjaan, Skill, dan Perusahaan" />
+            <input
+              type="text"
+              placeholder="Cari Nama Pekerjaan, Skill, dan Perusahaan"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
-          <div className={styles.searchInput}>
+          <div className={styles.searchInput} style={{ position: 'relative' }}>
             <svg width="18" height="18" fill="none" stroke="#94a3b8" strokeWidth="2" viewBox="0 0 24 24">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
               <circle cx="12" cy="10" r="3" />
             </svg>
-            <input type="text" placeholder="Semua Kota/Provinsi" />
+            <input
+              type="text"
+              placeholder="Semua Kota/Provinsi"
+              value={locationFilter}
+              onChange={(e) => setLocationFilter(e.target.value)}
+              onFocus={() => setShowLocationSuggestions(true)}
+              onBlur={() => setTimeout(() => setShowLocationSuggestions(false), 200)}
+            />
+            {locationFilter && (
+              <button
+                type="button"
+                onClick={() => setLocationFilter('')}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '4px', display: 'flex' }}
+                aria-label="Clear"
+              >
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            )}
+            {showLocationSuggestions && locationSuggestions.length > 0 && (
+              <div style={{
+                position: 'absolute',
+                top: 'calc(100% + 6px)',
+                left: 0,
+                right: 0,
+                zIndex: 50,
+                background: 'white',
+                border: '1px solid #e2e8f0',
+                borderRadius: '12px',
+                boxShadow: '0 10px 40px rgba(0,0,0,0.12)',
+                maxHeight: '220px',
+                overflowY: 'auto',
+                padding: '6px',
+              }}>
+                {locationSuggestions.map((loc) => (
+                  <div
+                    key={loc.id}
+                    onMouseDown={() => { setLocationFilter(loc.name); setShowLocationSuggestions(false); }}
+                    style={{
+                      padding: '10px 14px',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      color: '#334155',
+                      borderRadius: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      transition: 'background 0.15s',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = '#f1f5f9')}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                  >
+                    <svg width="14" height="14" fill="none" stroke="#6366f1" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                      <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    {loc.name}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <button className={styles.searchBtn}>CARI</button>
         </div>
@@ -111,16 +177,14 @@ export function LowonganPage() {
       <div className={styles.main}>
         {/* Sidebar */}
         <aside className={styles.sidebar}>
-          {/* QR Banner */}
           <div className={styles.qrBanner}>
-            <div className={styles.qrIcon}>📱</div>
+            <div className={styles.qrIcon}></div>
             <div>
               <div className={styles.qrTitle}>Loker Lebih Mudah!</div>
               <div className={styles.qrDesc}>Scan QR untuk download App</div>
             </div>
           </div>
 
-          {/* Prioritas */}
           <div className={styles.filterGroup}>
             <div className={styles.filterHeader}>
               <span>Prioritas</span>
@@ -132,7 +196,6 @@ export function LowonganPage() {
             </div>
           </div>
 
-          {/* Tipe Pekerjaan */}
           <div className={styles.filterGroup}>
             <div className={styles.filterHeader}>
               <span>Tipe Pekerjaan</span>
@@ -146,7 +209,6 @@ export function LowonganPage() {
             </div>
           </div>
 
-          {/* Kebijakan Kerja */}
           <div className={styles.filterGroup}>
             <div className={styles.filterHeader}>
               <span>Kebijakan Kerja</span>
@@ -158,85 +220,93 @@ export function LowonganPage() {
               <label className={styles.checkItem}><input type="checkbox" /> Kerja Hybrid</label>
             </div>
           </div>
-
-          {/* Kecamatan */}
-          <div className={styles.filterGroup}>
-            <div className={styles.filterHeader}>
-              <span>Kecamatan</span>
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></svg>
-            </div>
-            <div className={styles.filterChecks}>
-              <label className={styles.checkItem}><input type="checkbox" /> Jakarta Selatan</label>
-              <label className={styles.checkItem}><input type="checkbox" /> Bandung City</label>
-              <label className={styles.checkItem}><input type="checkbox" /> Sleman, DIY</label>
-            </div>
-          </div>
         </aside>
 
         {/* Job Listings */}
         <section className={styles.listings}>
           <h2 className={styles.listingsTitle}>
-            Daftar Lowongan Kerja & Magang <span className={styles.resultCount}>(124 Hasil)</span>
+            Daftar Lowongan Kerja & Magang <span className={styles.resultCount}>({filtered.length} Hasil)</span>
           </h2>
 
-          <div className={styles.jobGrid}>
-            {jobListings.map((job) => (
-              <div key={job.id} className={styles.jobCard}>
-                <div className={styles.jobCardHeader}>
-                  <div className={styles.jobAvatar} style={{ background: job.color }}>
-                    {job.initial}
+          {/* Loading State */}
+          {isLoading && (
+            <div className={styles.jobGrid}>
+              {[1, 2, 3].map((i) => (
+                <div key={i} className={styles.jobCard} style={{ opacity: 0.5, animation: 'pulse 1.5s infinite' }}>
+                  <div style={{ height: 20, background: '#e5e7eb', borderRadius: 4, width: '70%', marginBottom: 12 }} />
+                  <div style={{ height: 14, background: '#e5e7eb', borderRadius: 4, width: '50%', marginBottom: 8 }} />
+                  <div style={{ height: 14, background: '#e5e7eb', borderRadius: 4, width: '60%', marginBottom: 8 }} />
+                  <div style={{ height: 36, background: '#e5e7eb', borderRadius: 8, width: '40%', marginTop: 16 }} />
+                </div>
+              ))}
+              <style>{`@keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }`}</style>
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && !isLoading && (
+            <div style={{ textAlign: 'center', padding: '40px 0' }}>
+              <p style={{ color: '#ef4444', marginBottom: 16 }}>{error}</p>
+              <button onClick={fetchInternships} className={styles.applyBtn}>Coba Lagi</button>
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!isLoading && !error && filtered.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748b' }}>
+              <p>Tidak ada lowongan ditemukan.</p>
+              {searchQuery && <p style={{ fontSize: 14 }}>Coba ubah kata kunci pencarian Anda.</p>}
+            </div>
+          )}
+
+          {/* Job Cards */}
+          {!isLoading && !error && filtered.length > 0 && (
+            <div className={styles.jobGrid}>
+              {filtered.map((job) => (
+                <div key={job.id} className={styles.jobCard}>
+                  <div className={styles.jobCardHeader}>
+                    <div className={styles.jobAvatar} style={{ background: getColor(job.company) }}>
+                      {job.company.charAt(0).toUpperCase()}
+                    </div>
+                    <div className={styles.jobInfo}>
+                      <h3 className={styles.jobTitle}>{job.title}</h3>
+                      <p className={styles.jobCompany}>{job.company}</p>
+                    </div>
                   </div>
-                  <div className={styles.jobInfo}>
-                    <h3 className={styles.jobTitle}>{job.title}</h3>
-                    <p className={styles.jobCompany}>
-                      {job.company}
-                      {job.verified && <span className={styles.verified}>VERIFIED</span>}
-                    </p>
+
+                  <div className={styles.jobMeta}>
+                    {job.type && <span>{job.type}</span>}
+                    {job.duration && <span>{job.duration}</span>}
                   </div>
-                  <div className={styles.matchBadge}>{job.match}% Match</div>
-                </div>
+                  <div className={styles.jobLocation}>{job.location}</div>
 
-                <div className={styles.jobMeta}>
-                  <span>📋 {job.type}</span>
-                  <span>⏱️ {job.duration}</span>
-                </div>
-                <div className={styles.jobLocation}>📍 {job.location}</div>
+                  {job.skills.length > 0 && (
+                    <div className={styles.jobTags}>
+                      {job.skills.slice(0, 4).map((s) => (
+                        <span key={s.skill.id} className={styles.jobTag}>{s.skill.name}</span>
+                      ))}
+                      {job.skills.length > 4 && (
+                        <span className={styles.jobTag}>+{job.skills.length - 4}</span>
+                      )}
+                    </div>
+                  )}
 
-                {job.tags.length > 0 && (
-                  <div className={styles.jobTags}>
-                    {job.tags.map((tag) => (
-                      <span key={tag} className={styles.jobTag}>{tag}</span>
-                    ))}
+                  <div className={styles.jobActions}>
+                    <Link to={`/lowongan/${job.id}`} className={styles.applyBtn}>Lihat Detail</Link>
+                    <button className={styles.bookmarkBtn} aria-label="Bookmark">
+                      <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                      </svg>
+                    </button>
                   </div>
-                )}
 
-                <div className={styles.jobActions}>
-                  <button className={styles.applyBtn}>Lamar Sekarang</button>
-                  <button className={styles.bookmarkBtn} aria-label="Bookmark">
-                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-                    </svg>
-                  </button>
+                  <div className={styles.jobFooter}>
+                    <span className={styles.jobPosted}>{timeAgo(job.createdAt)}</span>
+                  </div>
                 </div>
-
-                <div className={styles.jobFooter}>
-                  <span className={styles.jobPosted}>{job.posted}</span>
-                  {job.urgent && <span className={styles.urgentBadge}>URGENT</span>}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Pagination */}
-          <div className={styles.pagination}>
-            <button className={styles.pageBtn}>‹</button>
-            <button className={`${styles.pageBtn} ${styles.pageBtnActive}`}>1</button>
-            <button className={styles.pageBtn}>2</button>
-            <button className={styles.pageBtn}>3</button>
-            <span className={styles.pageDots}>...</span>
-            <button className={styles.pageBtn}>12</button>
-            <button className={styles.pageBtn}>›</button>
-          </div>
+              ))}
+            </div>
+          )}
         </section>
       </div>
 
@@ -259,66 +329,6 @@ export function LowonganPage() {
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className={styles.footer}>
-        <div className={styles.footerContainer}>
-          <div className={styles.footerTop}>
-            <div className={styles.footerBrand}>
-              <div className={styles.footerLogo}>Magang-in.</div>
-              <p>Platform pencarian magang dan kerja nomor satu di Indonesia untuk mahasiswa dan fresh graduate.</p>
-              <div className={styles.footerSocials}>
-                <a href="#" aria-label="Twitter">🐦</a>
-                <a href="#" aria-label="Instagram">📷</a>
-              </div>
-            </div>
-            <div className={styles.footerLinks}>
-              <div>
-                <h4>Kategori</h4>
-                <ul>
-                  <li>Human Resources</li>
-                  <li>Design</li>
-                  <li>Data Science</li>
-                  <li>Engineering</li>
-                  <li>Marketing</li>
-                </ul>
-              </div>
-              <div>
-                <h4>Kota Terpopuler</h4>
-                <ul>
-                  <li>Loker Jakarta</li>
-                  <li>Loker Bandung</li>
-                  <li>Loker Surabaya</li>
-                  <li>Loker Jogja</li>
-                  <li>Loker Medan</li>
-                </ul>
-              </div>
-              <div>
-                <h4>Pencarian Terbanyak</h4>
-                <ul>
-                  <li>Work From Home</li>
-                  <li>Magang Mahasiswa</li>
-                  <li>Management Trainee</li>
-                  <li>Admin Social Media</li>
-                  <li>Graphic Designer</li>
-                </ul>
-              </div>
-              <div>
-                <h4>Tentang Kami</h4>
-                <ul>
-                  <li>Pusat Bantuan</li>
-                  <li>Hubungi Kami</li>
-                  <li>Kebijakan Privasi</li>
-                  <li>Syarat & Ketentuan</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div className={styles.footerBottom}>
-            © 2026 Magang-in Indonesia. Seluruh hak cipta dilindungi.
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

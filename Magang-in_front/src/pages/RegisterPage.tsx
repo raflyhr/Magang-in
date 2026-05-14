@@ -5,8 +5,9 @@ import { authService } from '../services/auth.service';
 import styles from './LoginPage.module.css';
 import loginBg from '../assets/login-bg.png';
 
-export function LoginPage() {
+export function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -15,40 +16,33 @@ export function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  // Redirect berdasarkan role user
-  const redirectByRole = (role: string) => {
-    switch (role) {
-      case 'mitra':
-        navigate('/mitra/dashboard');
-        break;
-      case 'admin':
-        navigate('/admin/dashboard');
-        break;
-      default:
-        navigate('/dashboard');
-    }
-  };
-
-  // Handle form submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (!email || !password) {
-      setError('Email dan password harus diisi');
+    // Validasi client-side
+    if (!name || name.length < 2) {
+      setError('Nama minimal 2 karakter');
+      return;
+    }
+    if (!email || !email.includes('@')) {
+      setError('Format email tidak valid');
+      return;
+    }
+    if (!password || password.length < 6) {
+      setError('Password minimal 6 karakter');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      const response = await authService.login(email, password);
-      const { token, _id, name, email: userEmail, role, profileImage } = response.data;
+      const response = await authService.register(name, email, password);
+      const { token, _id, name: userName, email: userEmail, role, profileImage } = response.data;
 
-      // Simpan token & set user di AuthContext
       login(token, {
         id: _id,
-        name,
+        name: userName,
         email: userEmail,
         role: role as 'admin' | 'mitra' | 'pengguna',
         phone: null,
@@ -58,13 +52,11 @@ export function LoginPage() {
         profileImage,
       });
 
-      // Redirect sesuai role
-      redirectByRole(role);
+      navigate('/dashboard');
     } catch (err: unknown) {
-      // Tampilkan error dari backend
       if (err && typeof err === 'object' && 'response' in err) {
         const axiosErr = err as { response?: { data?: { message?: string } } };
-        setError(axiosErr.response?.data?.message || 'Login gagal. Coba lagi.');
+        setError(axiosErr.response?.data?.message || 'Registrasi gagal. Coba lagi.');
       } else {
         setError('Tidak dapat terhubung ke server. Periksa koneksi internet Anda.');
       }
@@ -73,7 +65,6 @@ export function LoginPage() {
     }
   };
 
-  // Handle Google OAuth
   const handleGoogleLogin = () => {
     const baseUrl = import.meta.env.VITE_API_BASE_URL;
     window.location.href = `${baseUrl}/auth/google`;
@@ -81,7 +72,6 @@ export function LoginPage() {
 
   return (
     <div className={styles.page}>
-      {/* Back button */}
       <button className={styles.backBtn} onClick={() => navigate('/')} aria-label="Back to home">
         <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <line x1="19" y1="12" x2="5" y2="12" />
@@ -91,7 +81,6 @@ export function LoginPage() {
       </button>
 
       <div className={styles.card}>
-
         {/* Left Panel */}
         <div className={styles.left} style={{ backgroundImage: `linear-gradient(145deg, rgba(55, 48, 163, 0.85) 0%, rgba(79, 70, 229, 0.75) 50%, rgba(99, 102, 241, 0.7) 100%), url(${loginBg})` }}>
           <div className={styles.brand}>
@@ -101,11 +90,10 @@ export function LoginPage() {
 
           <div className={styles.leftContent}>
             <h2 className={styles.leftTitle}>
-              Perjalanan Karier Anda,<br />Dipercepat oleh AI.
+              Mulai Perjalanan<br />Karier Anda Sekarang.
             </h2>
             <p className={styles.leftDesc}>
-             Bergabunglah dengan ribuan mahasiswa yang mendapatkan magang berdampak tinggi
-melalui mesin pencocokan cerdas kami. Kami menghubungkan keterampilan Anda dengan tim teknologi paling inovatif di dunia.
+              Daftar gratis dan dapatkan akses ke ribuan lowongan magang dari perusahaan teknologi terkemuka di Indonesia.
             </p>
           </div>
 
@@ -122,11 +110,23 @@ melalui mesin pencocokan cerdas kami. Kami menghubungkan keterampilan Anda denga
         {/* Right Panel */}
         <div className={styles.right}>
           <div>
-            <h1 className={styles.title}>Welcome back</h1>
-            <p className={styles.subtitle}>Akses dashboard magang Anda yang didukung Oleh AI</p>
+            <h1 className={styles.title}>Create Account</h1>
+            <p className={styles.subtitle}>Daftar untuk mulai mencari magang impian Anda</p>
           </div>
 
           <form className={styles.form} onSubmit={handleSubmit}>
+            <div className={styles.field}>
+              <label className={styles.label}>Nama Lengkap</label>
+              <input
+                type="text"
+                className={styles.input}
+                placeholder="John Doe"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                disabled={isLoading}
+              />
+            </div>
+
             <div className={styles.field}>
               <label className={styles.label}>Email Address</label>
               <input
@@ -145,7 +145,7 @@ melalui mesin pencocokan cerdas kami. Kami menghubungkan keterampilan Anda denga
                 <input
                   type={showPassword ? 'text' : 'password'}
                   className={styles.input}
-                  placeholder="••••••••"
+                  placeholder="Minimal 6 karakter"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}
@@ -172,21 +172,12 @@ melalui mesin pencocokan cerdas kami. Kami menghubungkan keterampilan Anda denga
               </div>
             </div>
 
-            {/* Error message */}
             {error && (
               <p style={{ color: '#ef4444', fontSize: '0.875rem', margin: '0' }}>{error}</p>
             )}
 
-            <div className={styles.row}>
-              <label className={styles.checkLabel}>
-                <input type="checkbox" />
-                <span>Remember me</span>
-              </label>
-              <a href="#" className={styles.forgot}>Forgot password?</a>
-            </div>
-
             <button type="submit" className={styles.btnSignIn} disabled={isLoading}>
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? 'Creating account...' : 'Sign Up'}
             </button>
           </form>
 
@@ -204,25 +195,15 @@ melalui mesin pencocokan cerdas kami. Kami menghubungkan keterampilan Anda denga
               </svg>
               Google
             </button>
-            <button className={styles.socialBtn} type="button">
-              <svg width="18" height="18" fill="#0A66C2" viewBox="0 0 24 24">
-                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
-                <rect x="2" y="9" width="4" height="12"/>
-                <circle cx="4" cy="4" r="2"/>
-              </svg>
-              LinkedIn
-            </button>
           </div>
 
           <p className={styles.register}>
-            Don't have an account?{' '}
-            <Link to="/register" className={styles.registerLink}>Sign up for free</Link>
+            Already have an account?{' '}
+            <Link to="/login" className={styles.registerLink}>Sign in</Link>
           </p>
         </div>
-
       </div>
 
-      {/* Footer */}
       <div className={styles.pageFooter}>
         <span>Magang-in Platform © 2026. Empowering next-gen tech talent.</span>
         <div className={styles.footerLinks}>

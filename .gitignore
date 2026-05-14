@@ -34,3 +34,6 @@ generated/prisma
 
 # Kiro
 .kiro
+
+# Ignore Windows nul
+nul
