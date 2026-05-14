@@ -1,0 +1,123 @@
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #ffffff;
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    height: 60px;
+    gap: 40px;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.logoText {
+    color: var(--text-dark);
+}
+
+.logoAccent {
+    color: var(--primary);
+}
+
+.navLinks {
+    display: flex;
+    list-style: none;
+    gap: 8px;
+    flex: 1;
+}
+
+.navLink,
+.navLinkActive {
+    font-size: 14px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: color 0.2s;
+    color: var(--text);
+}
+
+.navLink:hover {
+    color: var(--text-dark);
+}
+
+.navLinkActive {
+    color: var(--primary);
+    position: relative;
+}
+
+.navLinkActive::after {
+    content: '';
+    position: absolute;
+    bottom: -18px;
+    left: 12px;
+    right: 12px;
+    height: 2px;
+    background: var(--primary);
+    border-radius: 2px 2px 0 0;
+}
+
+.navRight {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.iconBtn {
+    background: none;
+    border: none;
+    color: var(--text);
+    padding: 8px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+}
+
+.iconBtn:hover {
+    background: var(--bg-light);
+    color: var(--text-dark);
+}
+
+.loginBtn {
+    display: flex;
+    align-items: center;
+    background: white;
+    color: var(--text-dark);
+    border: 1.5px solid var(--border);
+    padding: 7px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: border-color 0.2s, color 0.2s;
+    white-space: nowrap;
+}
+
+.loginBtn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+@media (max-width: 768px) {
+    .navLinks {
+        display: none;
+    }
+
+    .iconBtn {
+        display: none;
+    }
+}
