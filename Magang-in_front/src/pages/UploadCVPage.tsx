@@ -119,7 +119,6 @@ export function UploadCVPage() {
             <p>AI sedang menganalisis CV kamu...</p>
           </div>
         )}
-br
         {/* Results */}
         {extractedSkills.length > 0 && !isProcessing && (
           <div className={styles.results}>

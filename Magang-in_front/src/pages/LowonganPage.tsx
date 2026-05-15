@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { internshipService } from '../services/internship.service';
 import type { Internship, MasterLocation } from '../types';
 import styles from './LowonganPage.module.css';
@@ -21,6 +22,7 @@ function timeAgo(dateStr: string) {
 }
 
 export function LowonganPage() {
+  const { isAuthenticated } = useAuth();
   const [internships, setInternships] = useState<Internship[]>([]);
   const [locations, setLocations] = useState<MasterLocation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -310,7 +312,8 @@ export function LowonganPage() {
         </section>
       </div>
 
-      {/* CTA Banner */}
+      {/* CTA Banner — hanya tampil kalau belum login */}
+      {!isAuthenticated && (
       <div className={styles.ctaBanner}>
         <div className={styles.ctaContainer}>
           <div className={styles.ctaIcon}>
@@ -329,6 +332,7 @@ export function LowonganPage() {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 }

@@ -39,7 +39,7 @@ export function OAuthCallbackPage() {
             navigate('/admin/dashboard', { replace: true });
             break;
           default:
-            navigate('/dashboard', { replace: true });
+            navigate('/onboarding', { replace: true });
         }
       } catch {
         // Gagal ambil profil — token invalid
