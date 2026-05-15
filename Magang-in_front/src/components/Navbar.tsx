@@ -41,12 +41,7 @@ export function Navbar() {
             <Link to="/perusahaan" className={isActive('/perusahaan') ? styles.navLinkActive : styles.navLink}>
               Perusahaan
             </Link>
-          </li>
-          <li>
-            <a href="#" className={styles.navLink}>
-              Roadmaps
-            </a>
-          </li>
+          </li>  
         </ul>
 
         {/* Right side */}

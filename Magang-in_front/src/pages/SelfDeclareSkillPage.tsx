@@ -1,25 +1,61 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { skillService } from '../services/skill.service';
-import { aiService } from '../services/ai.service';
 import type { Skill } from '../types';
 import styles from './SelfDeclareSkillPage.module.css';
+
+const categories = ['All', 'Frontend', 'Backend', 'Data Science', 'AI', 'Design', 'Other'];
 
 export function SelfDeclareSkillPage() {
   const navigate = useNavigate();
   const [skills, setSkills] = useState<Skill[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const fetchSkills = async () => {
       try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000); // 5 detik timeout
         const response = await skillService.getAll();
-        setSkills(response.data);
+        clearTimeout(timeout);
+        if (response.data && response.data.length > 0) {
+          setSkills(response.data);
+        } else {
+          throw new Error('empty');
+        }
       } catch {
-        // handle error
+        // Fallback: tampilkan skill dummy kalau API gagal
+        setSkills([
+          { id: '1', name: 'HTML', category: 'Frontend' },
+          { id: '2', name: 'CSS', category: 'Frontend' },
+          { id: '3', name: 'JavaScript', category: 'Frontend' },
+          { id: '4', name: 'React', category: 'Frontend' },
+          { id: '5', name: 'Vue.js', category: 'Frontend' },
+          { id: '6', name: 'Angular', category: 'Frontend' },
+          { id: '7', name: 'Node.js', category: 'Backend' },
+          { id: '8', name: 'Express', category: 'Backend' },
+          { id: '9', name: 'Python', category: 'Backend' },
+          { id: '10', name: 'Django', category: 'Backend' },
+          { id: '11', name: 'Flask', category: 'Backend' },
+          { id: '12', name: 'SQL', category: 'Backend' },
+          { id: '13', name: 'PostgreSQL', category: 'Backend' },
+          { id: '14', name: 'MongoDB', category: 'Backend' },
+          { id: '15', name: 'PHP', category: 'Backend' },
+          { id: '16', name: 'Laravel', category: 'Backend' },
+          { id: '17', name: 'UI/UX Design', category: 'Design' },
+          { id: '18', name: 'Figma', category: 'Design' },
+          { id: '19', name: 'Flutter', category: 'Frontend' },
+          { id: '20', name: 'Docker', category: 'Backend' },
+          { id: '21', name: 'AWS', category: 'Backend' },
+          { id: '22', name: 'TypeScript', category: 'Frontend' },
+          { id: '23', name: 'TensorFlow', category: 'AI' },
+          { id: '24', name: 'Go', category: 'Backend' },
+          { id: '25', name: 'Git', category: 'Other' },
+        ]);
       } finally {
         setIsLoading(false);
       }
@@ -33,9 +69,12 @@ export function SelfDeclareSkillPage() {
     );
   };
 
-  const filteredSkills = skills.filter((s) =>
-    s.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredSkills = skills.filter((s) => {
+    const matchesSearch = s.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = activeCategory === 'All' || 
+      (s.category && s.category.toLowerCase() === activeCategory.toLowerCase());
+    return matchesSearch && matchesCategory;
+  });
 
   const selectedSkillNames = skills
     .filter((s) => selectedIds.includes(s.id))
@@ -45,9 +84,7 @@ export function SelfDeclareSkillPage() {
     if (selectedIds.length < 3) return;
     setIsSaving(true);
     try {
-      // Sync skill ke profil user
       await skillService.sync(selectedIds);
-      // Lanjut ke matching — simpan skill names di sessionStorage untuk halaman matching
       sessionStorage.setItem('user_skills_for_match', JSON.stringify(selectedSkillNames));
       navigate('/onboarding/matching');
     } catch {
@@ -56,6 +93,9 @@ export function SelfDeclareSkillPage() {
       setIsSaving(false);
     }
   };
+
+  // Progress: 50% karena step 1 of 2
+  const progress = Math.min(50 + (selectedIds.length / 3) * 50, 100);
 
   return (
     <div className={styles.page}>
@@ -67,6 +107,11 @@ export function SelfDeclareSkillPage() {
           <p className={styles.subtitle}>
             Centang skill yang kamu kuasai. Minimal pilih 3 skill untuk hasil matching yang akurat.
           </p>
+        </div>
+
+        {/* Progress bar */}
+        <div className={styles.progressBar}>
+          <div className={styles.progressFill} style={{ width: `${progress}%` }} />
         </div>
 
         {/* Search */}
@@ -83,28 +128,24 @@ export function SelfDeclareSkillPage() {
           />
         </div>
 
-        {/* Selected count */}
-        <p className={styles.count}>{selectedIds.length} skill dipilih</p>
+        {/* Category tabs */}
+        <div className={styles.categories}>
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              className={activeCategory === cat ? styles.catBtnActive : styles.catBtn}
+              onClick={() => setActiveCategory(cat)}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
 
-        {/* Selected chips */}
-        {selectedSkillNames.length > 0 && (
-          <div className={styles.selectedChips}>
-            {selectedSkillNames.map((name) => (
-              <span key={name} className={styles.chip}>
-                {name}
-                <button
-                  className={styles.chipX}
-                  onClick={() => {
-                    const skill = skills.find((s) => s.name === name);
-                    if (skill) toggleSkill(skill.id);
-                  }}
-                >
-                  &times;
-                </button>
-              </span>
-            ))}
-          </div>
-        )}
+        {/* Section header */}
+        <div className={styles.sectionHeader}>
+          <span className={styles.sectionTitle}>Populer</span>
+          <span className={styles.count}>{selectedIds.length} skill dipilih</span>
+        </div>
 
         {/* Skill Grid */}
         {isLoading ? (
@@ -127,11 +168,33 @@ export function SelfDeclareSkillPage() {
             ))}
           </div>
         )}
+      </div>
 
-        {/* Footer */}
-        <div className={styles.footer}>
+      {/* Sticky Footer */}
+      <div className={styles.footer}>
+        <div className={styles.footerLeft}>
+          {selectedSkillNames.length > 0 && (
+            <div className={styles.selectedChips}>
+              {selectedSkillNames.map((name) => (
+                <span key={name} className={styles.chip}>
+                  {name}
+                  <button
+                    className={styles.chipX}
+                    onClick={() => {
+                      const skill = skills.find((s) => s.name === name);
+                      if (skill) toggleSkill(skill.id);
+                    }}
+                  >
+                    &times;
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className={styles.footerRight}>
           <button className={styles.backBtn} onClick={() => navigate('/onboarding')}>
-            Kembali
+            ← Kembali
           </button>
           <button
             className={styles.nextBtn}

@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { aiService } from '../services/ai.service';
-import { skillService } from '../services/skill.service';
-import type { Skill } from '../types';
 import styles from './UploadCVPage.module.css';
 
 export function UploadCVPage() {
@@ -61,6 +59,15 @@ export function UploadCVPage() {
 
   return (
     <div className={styles.page}>
+      {/* Back button top-left */}
+      <button className={styles.topBackBtn} onClick={() => navigate('/onboarding')}>
+        <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <line x1="19" y1="12" x2="5" y2="12" />
+          <polyline points="12 19 5 12 12 5" />
+        </svg>
+        Kembali
+      </button>
+
       <div className={styles.container}>
         <p className={styles.step}>Step 1 of 2: Input Skill</p>
         <h1 className={styles.title}>Upload CV Kamu</h1>
@@ -112,7 +119,7 @@ export function UploadCVPage() {
             <p>AI sedang menganalisis CV kamu...</p>
           </div>
         )}
-
+br
         {/* Results */}
         {extractedSkills.length > 0 && !isProcessing && (
           <div className={styles.results}>
@@ -147,12 +154,7 @@ export function UploadCVPage() {
           </div>
         )}
 
-        {/* Back link */}
-        {!isProcessing && extractedSkills.length === 0 && (
-          <button className={styles.backLink} onClick={() => navigate('/onboarding')}>
-            Kembali
-          </button>
-        )}
+        {/* Back link sudah di atas */}
       </div>
     </div>
   );
