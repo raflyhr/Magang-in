@@ -25,7 +25,7 @@ export function LoginPage() {
         navigate('/admin/dashboard');
         break;
       default:
-        navigate('/dashboard');
+        navigate('/onboarding');
     }
   };
 

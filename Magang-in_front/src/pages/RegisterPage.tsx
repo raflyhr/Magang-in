@@ -52,7 +52,7 @@ export function RegisterPage() {
         profileImage,
       });
 
-      navigate('/dashboard');
+      navigate('/onboarding');
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'response' in err) {
         const axiosErr = err as { response?: { data?: { message?: string } } };

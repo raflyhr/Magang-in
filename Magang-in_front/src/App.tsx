@@ -8,7 +8,12 @@ import { Footer } from './components/Footer';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { OAuthCallbackPage } from './pages/OAuthCallbackPage';
+import { OnboardingPage } from './pages/OnboardingPage';
+import { SelfDeclareSkillPage } from './pages/SelfDeclareSkillPage';
+import { UploadCVPage } from './pages/UploadCVPage';
+import { MatchingResultPage } from './pages/MatchingResultPage';
 import { LowonganPage } from './pages/LowonganPage';
+import { DetailLowonganPage } from './pages/DetailLowonganPage';
 import { PerusahaanPage } from './pages/PerusahaanPage';
 
 // Layout dengan Navbar + Footer (untuk halaman umum)
@@ -41,6 +46,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<LandingContent />} />
           <Route path="/lowongan" element={<LowonganPage />} />
+          <Route path="/lowongan/:id" element={<DetailLowonganPage />} />
           <Route path="/perusahaan" element={<PerusahaanPage />} />
 
           {/* Protected: hanya role "pengguna" */}
@@ -68,6 +74,10 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/auth/google/callback" element={<OAuthCallbackPage />} />
+        <Route path="/onboarding" element={<OnboardingPage />} />
+        <Route path="/onboarding/self-declare" element={<SelfDeclareSkillPage />} />
+        <Route path="/onboarding/upload-cv" element={<UploadCVPage />} />
+        <Route path="/onboarding/matching" element={<MatchingResultPage />} />
       </Routes>
     </BrowserRouter>
   );
