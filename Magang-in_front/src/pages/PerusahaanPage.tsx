@@ -1,22 +1,66 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { internshipService } from '../services/internship.service';
+import type { Internship } from '../types';
 import styles from './PerusahaanPage.module.css';
 import heroBg from '../assets/bg-serch-company.png';
 
-const categories = ['All Companies', 'Technology', 'E-commerce', 'Fintech', 'Travel & Lifestyle'];
+const avatarColors = ['#4f46e5', '#f97316', '#3b82f6', '#22c55e', '#ef4444', '#8b5cf6', '#0ea5e9', '#ec4899', '#14b8a6', '#f43f5e'];
 
-const companies = [
-  { id: 1, name: 'Shopee Indonesia', category: 'E-commerce • Technology', location: 'Jakarta Selatan, ID', jobs: 12, badge: 'Top Partner', color: '#ff5722', initial: 'S' },
-  { id: 2, name: 'Gojek Indonesia', category: 'Super-app • Fintech', location: 'Jakarta Pusat, ID', jobs: 8, badge: 'AI-Matched', color: '#22c55e', initial: 'G' },
-  { id: 3, name: 'Glints Indonesia', category: 'HR Tech • Recruitment', location: 'South Jakarta, ID', jobs: 24, badge: '', color: '#3b82f6', initial: 'G' },
-  { id: 4, name: 'Traveloka', category: 'Travel Tech • Lifestyle', location: 'Tangerang, ID', jobs: 15, badge: '', color: '#0ea5e9', initial: 'T' },
-  { id: 5, name: 'Tokopedia', category: 'E-commerce • Retail Tech', location: 'Jakarta Barat, ID', jobs: 19, badge: '', color: '#22c55e', initial: 'T' },
-  { id: 6, name: 'Telkomsel', category: 'Telecommunication • Digital', location: 'Jakarta Selatan, ID', jobs: 5, badge: '', color: '#ef4444', initial: 'T' },
-  { id: 7, name: 'Bank Central Asia', category: 'Banking • Fintech', location: 'Jakarta Pusat, ID', jobs: 31, badge: 'AI-Matched', color: '#3b82f6', initial: 'B' },
-  { id: 8, name: 'Blibli.com', category: 'E-commerce • Tech', location: 'Jakarta Barat, ID', jobs: 10, badge: '', color: '#6366f1', initial: 'B' },
-];
+interface CompanyData {
+  name: string;
+  location: string;
+  jobCount: number;
+  color: string;
+}
 
 export function PerusahaanPage() {
-  const [activeCategory, setActiveCategory] = useState('All Companies');
+  const [companies, setCompanies] = useState<CompanyData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 8;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await internshipService.getAll();
+        // Group by company
+        const companyMap = new Map<string, { locations: Set<string>; count: number }>();
+        res.data.forEach((job: Internship) => {
+          const existing = companyMap.get(job.company);
+          if (existing) {
+            existing.count++;
+            existing.locations.add(job.location);
+          } else {
+            companyMap.set(job.company, { locations: new Set([job.location]), count: 1 });
+          }
+        });
+
+        const companyList: CompanyData[] = Array.from(companyMap.entries())
+          .map(([name, data], i) => ({
+            name,
+            location: Array.from(data.locations).slice(0, 2).join(', '),
+            jobCount: data.count,
+            color: avatarColors[i % avatarColors.length],
+          }))
+          .sort((a, b) => b.jobCount - a.jobCount);
+
+        setCompanies(companyList);
+      } catch { /* ignore */ }
+      finally { setIsLoading(false); }
+    };
+    fetchData();
+  }, []);
+
+  const filtered = companies.filter(c =>
+    !searchQuery || c.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+  useEffect(() => { setCurrentPage(1); }, [searchQuery]);
 
   return (
     <div className={styles.page}>
@@ -24,7 +68,7 @@ export function PerusahaanPage() {
       <div className={styles.heroBanner} style={{ backgroundImage: `linear-gradient(135deg, rgba(79, 70, 229, 0.85) 0%, rgba(99, 102, 241, 0.7) 100%), url(${heroBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
         <h1 className={styles.heroTitle}>Discover Your Future Workspace</h1>
         <p className={styles.heroSubtitle}>
-          Connect with Indonesia's leading tech giants and innovative startups partnering with Magang-in.
+          {companies.length} perusahaan mitra yang membuka lowongan magang di platform Magang-in.
         </p>
       </div>
 
@@ -34,61 +78,86 @@ export function PerusahaanPage() {
           <svg width="20" height="20" fill="none" stroke="#94a3b8" strokeWidth="2" viewBox="0 0 24 24">
             <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
-          <input type="text" placeholder="Search company names, industries..." />
+          <input
+            type="text"
+            placeholder="Cari nama perusahaan..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
           <button className={styles.searchBtn}>Search</button>
         </div>
       </div>
 
-      {/* Category Tabs */}
-      <div className={styles.categories}>
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            className={activeCategory === cat ? styles.catActive : styles.catBtn}
-            onClick={() => setActiveCategory(cat)}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
       {/* Company Grid */}
-      <div className={styles.grid}>
-        {companies.map((c) => (
-          <div key={c.id} className={styles.companyCard}>
-            {c.badge && (
-              <span className={c.badge === 'Top Partner' ? styles.badgePartner : styles.badgeAI}>
-                {c.badge === 'AI-Matched' && '✨ '}{c.badge}
-              </span>
-            )}
-            <div className={styles.companyIcon} style={{ background: `${c.color}20` }}>
-              <span style={{ color: c.color, fontWeight: 700, fontSize: 18 }}>{c.initial}</span>
-            </div>
-            <h3 className={styles.companyName}>{c.name}</h3>
-            <p className={styles.companyCategory}>{c.category}</p>
-            <p className={styles.companyLocation}>
-              <svg width="14" height="14" fill="none" stroke="#94a3b8" strokeWidth="2" viewBox="0 0 24 24">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
-              </svg>
-              {c.location}
-            </p>
-            <div className={styles.companyFooter}>
-              <span className={styles.jobCount}>{c.jobs} Lowongan</span>
-              <span className={styles.arrow}>→</span>
-            </div>
+      {isLoading ? (
+        <div style={{ padding: '60px', textAlign: 'center', color: '#64748b' }}>Memuat data perusahaan...</div>
+      ) : filtered.length === 0 ? (
+        <div style={{ padding: '60px', textAlign: 'center', color: '#64748b' }}>Tidak ada perusahaan ditemukan.</div>
+      ) : (
+        <>
+          <div className={styles.grid}>
+            {paginated.map((c) => (
+              <div key={c.name} className={styles.companyCard}>
+                <div className={styles.companyIcon} style={{ background: `${c.color}20` }}>
+                  <span style={{ color: c.color, fontWeight: 700, fontSize: 18 }}>{c.name.charAt(0).toUpperCase()}</span>
+                </div>
+                <h3 className={styles.companyName}>{c.name}</h3>
+                <p className={styles.companyLocation}>
+                  <svg width="14" height="14" fill="none" stroke="#94a3b8" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
+                  </svg>
+                  {c.location}
+                </p>
+                <div className={styles.companyFooter}>
+                  <span className={styles.jobCount}>{c.jobCount} Lowongan</span>
+                  <Link to={`/lowongan?search=${encodeURIComponent(c.name)}`} className={styles.arrow}>→</Link>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      {/* Pagination */}
-      <div className={styles.pagination}>
-        <button className={styles.pageBtn}>‹</button>
-        <button className={`${styles.pageBtn} ${styles.pageBtnActive}`}>1</button>
-        <button className={styles.pageBtn}>2</button>
-        <button className={styles.pageBtn}>3</button>
-        <button className={styles.pageBtn}>›</button>
-      </div>
-
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className={styles.pagination}>
+              <button
+                className={styles.pageBtn}
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                ‹
+              </button>
+              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                let pageNum: number;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+                return (
+                  <button
+                    key={pageNum}
+                    className={`${styles.pageBtn} ${currentPage === pageNum ? styles.pageBtnActive : ''}`}
+                    onClick={() => setCurrentPage(pageNum)}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              <button
+                className={styles.pageBtn}
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
+                ›
+              </button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

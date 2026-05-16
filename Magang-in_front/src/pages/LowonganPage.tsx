@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { internshipService } from '../services/internship.service';
 import type { Internship, MasterLocation } from '../types';
@@ -23,13 +23,16 @@ function timeAgo(dateStr: string) {
 
 export function LowonganPage() {
   const { isAuthenticated } = useAuth();
+  const [searchParams] = useSearchParams();
   const [internships, setInternships] = useState<Internship[]>([]);
   const [locations, setLocations] = useState<MasterLocation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [locationFilter, setLocationFilter] = useState('');
   const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
 
   // Suggestions berdasarkan input
   const locationSuggestions = locations.filter((loc) =>
@@ -84,6 +87,13 @@ export function LowonganPage() {
 
     return matchesSearch && matchesLocation;
   });
+
+  // Pagination
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const paginatedJobs = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+  // Reset page saat filter berubah
+  useEffect(() => { setCurrentPage(1); }, [searchQuery, locationFilter]);
 
   return (
     <div className={styles.page}>
@@ -217,8 +227,9 @@ export function LowonganPage() {
 
           {/* Job Cards */}
           {!isLoading && !error && filtered.length > 0 && (
+            <>
             <div className={styles.jobGrid}>
-              {filtered.map((job) => (
+              {paginatedJobs.map((job) => (
                 <div key={job.id} className={styles.jobCard}>
                   <div className={styles.jobCardHeader}>
                     <div className={styles.jobAvatar} style={{ background: getColor(job.company) }}>
@@ -262,6 +273,57 @@ export function LowonganPage() {
                 </div>
               ))}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '32px', paddingBottom: '16px' }}>
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  style={{ padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: '8px', background: 'white', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', opacity: currentPage === 1 ? 0.5 : 1 }}
+                >
+                  ‹
+                </button>
+                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                  let pageNum: number;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      style={{
+                        padding: '8px 14px',
+                        border: currentPage === pageNum ? 'none' : '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        background: currentPage === pageNum ? '#6366f1' : 'white',
+                        color: currentPage === pageNum ? 'white' : '#334155',
+                        fontWeight: currentPage === pageNum ? 700 : 500,
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                      }}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+                <button
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  style={{ padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: '8px', background: 'white', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', opacity: currentPage === totalPages ? 0.5 : 1 }}
+                >
+                  ›
+                </button>
+              </div>
+            )}
+            </>
           )}
         </section>
       </div>

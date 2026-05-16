@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { aiService } from '../services/ai.service';
+import { skillService } from '../services/skill.service';
 import styles from './UploadCVPage.module.css';
 
 export function UploadCVPage() {
@@ -29,8 +30,8 @@ export function UploadCVPage() {
     setError('');
     try {
       const response = await aiService.scanCV(file);
-      setExtractedSkills(response.data.extractedSkills);
-      setConfidence(response.data.confidence);
+      setExtractedSkills(response.data.extractedSkills || []);
+      setConfidence(response.data.confidence || 0.85);
     } catch {
       setError('Gagal memproses CV. Coba lagi.');
     } finally {
@@ -46,10 +47,44 @@ export function UploadCVPage() {
     if (extractedSkills.length === 0) return;
     setIsSaving(true);
     try {
-      // Simpan skill names ke session untuk matching
-      sessionStorage.setItem('user_skills_for_match', JSON.stringify(extractedSkills));
-      // Juga sync ke backend (perlu cari skill IDs dari nama — simplified: langsung ke matching)
-      navigate('/onboarding/matching');
+      // Normalize skill names via AI sebelum matching
+      let normalizedNames = extractedSkills;
+      try {
+        const normalizeRes = await aiService.normalizeSkills(extractedSkills);
+        if (normalizeRes.data.normalized && normalizeRes.data.normalized.length > 0) {
+          normalizedNames = normalizeRes.data.normalized.map(n => n.normalized || n.original);
+        }
+      } catch {
+        // Jika normalize gagal, pakai nama asli dari CV
+      }
+
+      // Sync skill ke DB: cari skill IDs dari master skill yang cocok
+      try {
+        const allSkillsRes = await skillService.getAll();
+        const masterSkills = allSkillsRes.data;
+        
+        // Match extracted skills dengan master skills (case-insensitive)
+        const matchedIds = normalizedNames
+          .map(name => {
+            const found = masterSkills.find(ms => 
+              ms.name.toLowerCase() === name.toLowerCase() ||
+              ms.name.toLowerCase().includes(name.toLowerCase()) ||
+              name.toLowerCase().includes(ms.name.toLowerCase())
+            );
+            return found?.id;
+          })
+          .filter((id): id is string => !!id);
+
+        if (matchedIds.length > 0) {
+          await skillService.sync(matchedIds);
+        }
+      } catch {
+        // Jika sync gagal, tetap lanjut ke matching dengan session
+      }
+
+      // Simpan ke session sebagai backup
+      sessionStorage.setItem('user_skills_for_match', JSON.stringify(normalizedNames));
+      navigate('/dashboard/rekomendasi');
     } catch {
       setError('Gagal menyimpan. Coba lagi.');
     } finally {
@@ -60,7 +95,7 @@ export function UploadCVPage() {
   return (
     <div className={styles.page}>
       {/* Back button top-left */}
-      <button className={styles.topBackBtn} onClick={() => navigate('/onboarding')}>
+      <button className={styles.topBackBtn} onClick={() => navigate(-1)}>
         <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <line x1="19" y1="12" x2="5" y2="12" />
           <polyline points="12 19 5 12 12 5" />

@@ -6,9 +6,25 @@ export const internshipService = {
   create: (data: Partial<Internship>) => 
     api.post<{ message: string; internship: Internship }>('/internships', data),
 
+  // Update lowongan (khusus Mitra)
+  update: (id: string, data: Partial<Internship>) =>
+    api.put<{ message: string; internship: Internship }>(`/internships/mitra/${id}`, data),
+
+  // Delete lowongan (khusus Mitra)
+  delete: (id: string) =>
+    api.delete<{ message: string }>(`/internships/mitra/${id}`),
+
   // Get semua lowongan milik mitra login
   getMyInternships: () =>
-    api.get<Internship[]>('/internships/my-listings'),
+    api.get<Internship[]>('/internships/mitra/my-postings'),
+
+  // Get pelamar pada lowongan tertentu (khusus Mitra)
+  getApplicants: (internshipId: string) =>
+    api.get<any[]>(`/internships/${internshipId}/applicants`),
+
+  // Update status pelamar (khusus Mitra)
+  updateApplicationStatus: (applicationId: string, status: 'accepted' | 'rejected') =>
+    api.patch<{ message: string }>(`/internships/applications/${applicationId}`, { status }),
 
   // Get detail lowongan
   getById: (id: string) =>
@@ -18,7 +34,11 @@ export const internshipService = {
   getAll: () =>
     api.get<Internship[]>('/internships'),
 
-  // Get daftar lokasi unik dari lowongan
+  // Get daftar lokasi
   getLocations: () =>
     api.get<MasterLocation[]>('/internships/locations'),
+
+  // Get daftar jurusan
+  getMajors: () =>
+    api.get<{ id: string; name: string }[]>('/internships/majors'),
 }

@@ -22,6 +22,7 @@ export function DetailLowonganPage() {
   const [applyLoading, setApplyLoading] = useState(false);
   const [applyError, setApplyError] = useState('');
   const [applySuccess, setApplySuccess] = useState(false);
+  const [hasApplied, setHasApplied] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchDetail = async () => {
@@ -49,6 +50,16 @@ export function DetailLowonganPage() {
 
   useEffect(() => {
     fetchDetail();
+    // Check if user already applied
+    if (isAuthenticated && user?.role === 'pengguna' && id) {
+      applicationService.getMyApplications().then(res => {
+        const alreadyApplied = res.data.some(app => app.internshipId === id);
+        if (alreadyApplied) {
+          setHasApplied(true);
+          setApplySuccess(true);
+        }
+      }).catch(() => {});
+    }
   }, [id]);
 
   // Loading state
@@ -119,6 +130,11 @@ export function DetailLowonganPage() {
     try {
       await applicationService.apply(id, coverLetter || undefined, cvFile || undefined);
       setApplySuccess(true);
+      setHasApplied(true);
+      // Auto close modal setelah 1.5 detik
+      setTimeout(() => {
+        closeApplyModal();
+      }, 1500);
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'response' in err) {
         const axiosErr = err as { response?: { data?: { message?: string } } };
@@ -168,9 +184,9 @@ export function DetailLowonganPage() {
           <button 
             className={styles.applyBtn} 
             onClick={() => setShowApplyModal(true)}
-            disabled={applySuccess}
+            disabled={hasApplied}
           >
-            {applySuccess ? '✓ Lamaran Terkirim' : 'Lamar Sekarang'}
+            {hasApplied ? '✓ Sudah Dilamar' : 'Lamar Sekarang'}
           </button>
         )}
       </div>

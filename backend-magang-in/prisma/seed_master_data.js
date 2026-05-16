@@ -1,6 +1,14 @@
 import { PrismaClient } from '@prisma/client';
+import pg from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
+import 'dotenv/config';
 
-const prisma = new PrismaClient();
+const { Pool } = pg;
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   const locations = [
@@ -8,7 +16,7 @@ async function main() {
   ];
 
   const majors = [
-    'Teknik Informatika', 'Sistem Informasi', 'Teknik Elektro', 'Manajemen', 
+    'Teknik Informatika', 'Sistem Informasi', 'Teknik Elektro', 'Manajemen',
     'Akuntansi', 'Ilmu Komunikasi', 'Desain Komunikasi Visual', 'Umum'
   ];
 

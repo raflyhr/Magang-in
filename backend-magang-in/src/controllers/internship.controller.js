@@ -54,15 +54,74 @@ export const createInternship = async (req, res) => {
     const { title, companyName, location, type, duration, level, major, requirements, skills, benefits, description } = req.body;
     const mitraId = req.userId; // Dari token
 
+    // Ambil nama perusahaan dari profil mitra jika tidak dikirim
+    let company = companyName || req.body.company;
+    if (!company) {
+      const mitra = await prisma.user.findUnique({ where: { id: mitraId }, select: { name: true } });
+      company = mitra?.name || 'Unknown Company';
+    }
+
     const internship = await prisma.internship.create({
-      data: { 
-        title, company: companyName || req.body.company, location, description, 
+      data: {
+        title, company, location, description,
         type, duration, level, major, requirements, skillsRequired: skills, benefits,
-        mitraId 
+        mitraId
       }
     });
-    
-    res.status(201).json(internship);
+
+    res.status(201).json({ message: 'Lowongan berhasil dibuat', internship });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Update Lowongan
+export const updateInternship = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const mitraId = req.userId;
+    const { title, company, location, type, duration, level, major, requirements, skills, benefits, description, isClosed } = req.body;
+
+    // Pastikan lowongan ini milik mitra yang login
+    const existing = await prisma.internship.findFirst({ where: { id, mitraId } });
+    if (!existing) return res.status(403).json({ message: 'Akses ditolak atau lowongan tidak ditemukan.' });
+
+    const updateData = {};
+    if (title !== undefined) updateData.title = title;
+    if (company !== undefined) updateData.company = company;
+    if (location !== undefined) updateData.location = location;
+    if (type !== undefined) updateData.type = type;
+    if (duration !== undefined) updateData.duration = duration;
+    if (level !== undefined) updateData.level = level;
+    if (major !== undefined) updateData.major = major;
+    if (requirements !== undefined) updateData.requirements = requirements;
+    if (skills !== undefined) updateData.skillsRequired = skills;
+    if (benefits !== undefined) updateData.benefits = benefits;
+    if (description !== undefined) updateData.description = description;
+    if (isClosed !== undefined) updateData.isClosed = isClosed;
+
+    const internship = await prisma.internship.update({
+      where: { id },
+      data: updateData,
+    });
+
+    res.json({ message: 'Lowongan berhasil diperbarui', internship });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Delete Lowongan
+export const deleteInternship = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const mitraId = req.userId;
+
+    const existing = await prisma.internship.findFirst({ where: { id, mitraId } });
+    if (!existing) return res.status(403).json({ message: 'Akses ditolak atau lowongan tidak ditemukan.' });
+
+    await prisma.internship.delete({ where: { id } });
+    res.json({ message: 'Lowongan berhasil dihapus' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

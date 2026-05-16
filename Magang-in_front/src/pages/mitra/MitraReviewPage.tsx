@@ -1,133 +1,151 @@
+import { useState, useEffect } from 'react';
+import { internshipService } from '../../services/internship.service';
+import type { Internship, Applicant } from '../../types';
 import styles from './MitraReviewPage.module.css';
 
 export function MitraReviewPage() {
-  const applicants = [
-    {
-      id: 1,
-      name: 'Andi Pratama',
-      university: 'Univ. Indonesia',
-      major: 'Ilmu Komputer',
-      skills: ['React.js', 'Tailwind CSS', 'TypeScript'],
-      score: 98,
-      scoreColor: '#ecfdf5',
-      scoreText: '#059669',
-      border: '#22c55e',
-      avatar: 'https://ui-avatars.com/api/?name=Andi+Pratama&background=6366f1&color=fff'
-    },
-    {
-      id: 2,
-      name: 'Siti Aminah',
-      university: 'ITB',
-      major: 'Teknik Informatika',
-      skills: ['Vue.js', 'JavaScript', 'Figma'],
-      score: 85,
-      scoreColor: '#ecfdf5',
-      scoreText: '#059669',
-      border: '#22c55e',
-      avatar: 'https://ui-avatars.com/api/?name=Siti+Aminah&background=f97316&color=fff'
-    },
-    {
-      id: 3,
-      name: 'Budi Santoso',
-      university: 'UGM',
-      major: 'Teknologi Informasi',
-      skills: ['Next.js', 'CSS3'],
-      score: 72,
-      scoreColor: '#fff7ed',
-      scoreText: '#c2410c',
-      border: '#f97316',
-      avatar: 'https://ui-avatars.com/api/?name=Budi+Santoso&background=3b82f6&color=fff'
+  const [internships, setInternships] = useState<Internship[]>([]);
+  const [selectedInternshipId, setSelectedInternshipId] = useState<string>('');
+  const [applicants, setApplicants] = useState<Applicant[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingApplicants, setIsLoadingApplicants] = useState(false);
+
+  useEffect(() => {
+    const fetchInternships = async () => {
+      try {
+        const res = await internshipService.getMyInternships();
+        setInternships(res.data);
+        if (res.data.length > 0) {
+          setSelectedInternshipId(res.data[0].id);
+        }
+      } catch { /* ignore */ }
+      finally { setIsLoading(false); }
+    };
+    fetchInternships();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedInternshipId) return;
+    const fetchApplicants = async () => {
+      setIsLoadingApplicants(true);
+      try {
+        const res = await internshipService.getApplicants(selectedInternshipId);
+        setApplicants(res.data);
+      } catch { setApplicants([]); }
+      finally { setIsLoadingApplicants(false); }
+    };
+    fetchApplicants();
+  }, [selectedInternshipId]);
+
+  const handleUpdateStatus = async (applicationId: string, status: 'accepted' | 'rejected') => {
+    try {
+      await internshipService.updateApplicationStatus(applicationId, status);
+      // Refresh
+      setApplicants(prev => prev.map(a => a.id === applicationId ? { ...a, status } : a));
+    } catch {
+      alert('Gagal mengubah status pelamar.');
     }
-  ];
+  };
+
+  const selectedJob = internships.find(i => i.id === selectedInternshipId);
 
   return (
     <div className={styles.container}>
-      {/* Breadcrumb */}
       <div className={styles.topNav}>
         <div className={styles.breadcrumb}>
           <span className={styles.breadcrumbActive}>Review Pelamar</span>
-          <span className={styles.sep}>/</span>
-          <span>Frontend Developer</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <svg width="20" height="20" fill="none" stroke="#64748b" strokeWidth="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          <span style={{ fontSize: '14px', color: '#64748b' }}>Help</span>
-          <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}>GT</div>
         </div>
       </div>
 
-      {/* Header Card */}
+      {/* Job Selector */}
       <div className={styles.headerCard}>
         <div>
-          <h1 className={styles.jobTitle}>Frontend Developer</h1>
-          <p className={styles.jobSub}>Reviewing 3 top-tier candidates matching your technical requirements.</p>
-        </div>
-        <div className={styles.aiPowered}>
-          <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z"/></svg>
-          AI Match Powered
+          <h1 className={styles.jobTitle}>Daftar Pelamar</h1>
+          <p className={styles.jobSub}>Pilih lowongan untuk melihat pelamar.</p>
         </div>
       </div>
 
-      {/* Applicant Cards */}
-      <div className={styles.applicantList}>
-        {applicants.map((app) => (
-          <div key={app.id} className={styles.applicantCard} style={{ borderLeftColor: app.border }}>
-            <div className={styles.applicantInfo}>
-              <div className={styles.avatarWrapper}>
-                <img src={app.avatar} alt={app.name} className={styles.avatar} />
-                <div className={styles.verifiedBadge}>
-                  <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
-              </div>
-              <div>
-                <h3 className={styles.name}>{app.name}</h3>
-                <div className={styles.edu}>
-                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-                  {app.university} • {app.major}
-                </div>
-                <div className={styles.skillChips}>
-                  {app.skills.map(skill => (
-                    <span key={skill} className={styles.skillChip}>{skill}</span>
-                  ))}
-                </div>
-              </div>
+      {isLoading ? (
+        <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>Memuat...</div>
+      ) : internships.length === 0 ? (
+        <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>Belum ada lowongan.</div>
+      ) : (
+        <>
+          {/* Dropdown pilih lowongan */}
+          <div style={{ marginBottom: '24px' }}>
+            <select
+              value={selectedInternshipId}
+              onChange={(e) => setSelectedInternshipId(e.target.value)}
+              style={{ padding: '10px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '14px', width: '100%', maxWidth: '400px' }}
+            >
+              {internships.map(i => (
+                <option key={i.id} value={i.id}>{i.title} — {i.company}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Applicant List */}
+          {isLoadingApplicants ? (
+            <div style={{ padding: '20px', textAlign: 'center', color: '#64748b' }}>Memuat pelamar...</div>
+          ) : applicants.length === 0 ? (
+            <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
+              Belum ada pelamar untuk lowongan "{selectedJob?.title}".
             </div>
+          ) : (
+            <div className={styles.applicantList}>
+              {applicants.map((app) => (
+                <div key={app.id} className={styles.applicantCard} style={{ borderLeftColor: app.status === 'accepted' ? '#22c55e' : app.status === 'rejected' ? '#ef4444' : '#f59e0b' }}>
+                  <div className={styles.applicantInfo}>
+                    <div className={styles.avatarWrapper}>
+                      <div className={styles.avatar} style={{ background: '#6366f1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', width: '40px', height: '40px', borderRadius: '50%', fontWeight: 700 }}>
+                        {app.applicant.name?.charAt(0).toUpperCase() || '?'}
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className={styles.name}>{app.applicant.name || 'Tanpa Nama'}</h3>
+                      <div className={styles.edu}>{app.applicant.email}</div>
+                      {app.applicant.skills && app.applicant.skills.length > 0 && (
+                        <div className={styles.skillChips}>
+                          {app.applicant.skills.slice(0, 5).map(s => (
+                            <span key={s.skill.id} className={styles.skillChip}>{s.skill.name}</span>
+                          ))}
+                          {app.applicant.skills.length > 5 && (
+                            <span className={styles.skillChip}>+{app.applicant.skills.length - 5}</span>
+                          )}
+                        </div>
+                      )}
+                      {app.coverLetter && (
+                        <p style={{ fontSize: '12px', color: '#64748b', marginTop: '6px', fontStyle: 'italic' }}>
+                          "{app.coverLetter.substring(0, 100)}{app.coverLetter.length > 100 ? '...' : ''}"
+                        </p>
+                      )}
+                    </div>
+                  </div>
 
-            <div className={styles.scoreWrapper}>
-              <div>
-                <span className={styles.matchScoreLabel}>AI Match Score:</span>
-                <span className={styles.matchScoreValue} style={{ background: app.scoreColor, color: app.scoreText }}>
-                  {app.score}%
-                </span>
-              </div>
-              <div className={styles.actions}>
-                <button className={styles.tolakBtn}>Tolak</button>
-                <button className={styles.terimaBtn}>Terima</button>
-              </div>
+                  <div className={styles.scoreWrapper}>
+                    <div>
+                      <span style={{ fontSize: '11px', color: '#64748b', textTransform: 'uppercase', fontWeight: 700 }}>Status:</span>
+                      <span style={{ 
+                        display: 'inline-block', marginLeft: '8px', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 700,
+                        background: app.status === 'accepted' ? '#ecfdf5' : app.status === 'rejected' ? '#fef2f2' : '#fffbeb',
+                        color: app.status === 'accepted' ? '#059669' : app.status === 'rejected' ? '#dc2626' : '#d97706',
+                      }}>
+                        {app.status === 'accepted' ? 'Diterima' : app.status === 'rejected' ? 'Ditolak' : 'Pending'}
+                      </span>
+                    </div>
+                    {app.status === 'pending' && (
+                      <div className={styles.actions}>
+                        <button className={styles.tolakBtn} onClick={() => handleUpdateStatus(app.id, 'rejected')}>Tolak</button>
+                        <button className={styles.terimaBtn} onClick={() => handleUpdateStatus(app.id, 'accepted')}>Terima</button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Footer Info */}
-      <div className={styles.footerGrid}>
-        <div className={styles.insightCard}>
-          <h4 className={styles.insightTitle}>AI Talent Insight</h4>
-          <p className={styles.insightText}>
-            Andi Pratama shows exceptional mastery in modern frontend frameworks and has 100% stack compatibility with your project requirements.
-          </p>
-        </div>
-        <div className={styles.progressCard}>
-          <span className={styles.progressLabel}>TOTAL REVIEW</span>
-          <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '16px' }}>
-             <span className={styles.progressValue}>3</span>
-             <span className={styles.progressText}>Candidates Left</span>
-          </div>
-          <div className={styles.progressBar}>
-            <div className={styles.progressFill} style={{ width: '33.3%' }}></div>
-          </div>
-        </div>
-      </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

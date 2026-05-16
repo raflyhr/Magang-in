@@ -11,31 +11,58 @@ interface PostInternshipModalProps {
 export function PostInternshipModal({ isOpen, onClose, onSuccess }: PostInternshipModalProps) {
   const [formData, setFormData] = useState({
     title: '',
+    company: '',
     description: '',
     location: '',
-    type: 'Internship',
+    type: 'On-site',
+    duration: '3-6 Bulan',
+    level: 'Internship',
+    major: 'Teknik Informatika',
     requirements: '',
+    skillsRequired: '',
+    benefits: 'Sertifikat, Uang saku, Mentoring, Networking, Portfolio project',
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
+
+    if (!formData.title || !formData.company || !formData.description || !formData.location) {
+      setError('Judul, perusahaan, deskripsi, dan lokasi wajib diisi.');
+      setLoading(false);
+      return;
+    }
+
     try {
-      // Split requirements by newline to array
-      const reqArray = formData.requirements.split('\n').filter(r => r.trim() !== '');
       await internshipService.create({
-        ...formData,
-        requirements: reqArray as any // Assuming backend expects array or handles string
-      });
-      alert('Lowongan berhasil dipasang!');
+        title: formData.title,
+        company: formData.company,
+        description: formData.description,
+        location: formData.location,
+        type: formData.type,
+        duration: formData.duration,
+        level: formData.level,
+        major: formData.major,
+        requirements: formData.requirements,
+        skillsRequired: formData.skillsRequired,
+        benefits: formData.benefits,
+      } as any);
       onSuccess?.();
       onClose();
-    } catch (err) {
-      console.error(err);
-      alert('Gagal memasang lowongan. Silakan coba lagi.');
+      // Reset form
+      setFormData({
+        title: '', company: '', description: '', location: '',
+        type: 'On-site', duration: '3-6 Bulan', level: 'Internship',
+        major: 'Teknik Informatika', requirements: '', skillsRequired: '',
+        benefits: 'Sertifikat, Uang saku, Mentoring, Networking, Portfolio project',
+      });
+    } catch {
+      setError('Gagal memasang lowongan. Silakan coba lagi.');
     } finally {
       setLoading(false);
     }
@@ -55,46 +82,105 @@ export function PostInternshipModal({ isOpen, onClose, onSuccess }: PostInternsh
           </div>
 
           <form className={styles.form} onSubmit={handleSubmit}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Judul Lowongan</label>
-              <input
-                type="text"
-                className={styles.input}
-                placeholder="Contoh: Frontend Developer Intern"
-                required
-                value={formData.title}
-                onChange={e => setFormData({ ...formData, title: e.target.value })}
-              />
-            </div>
-
+            {/* Row 1: Title & Company */}
             <div className={styles.row}>
               <div className={styles.formGroup}>
-                <label className={styles.label}>Tipe Pekerjaan</label>
-                <select 
-                  className={styles.select}
-                  value={formData.type}
-                  onChange={e => setFormData({ ...formData, type: e.target.value })}
-                >
-                  <option value="Internship">Internship</option>
-                  <option value="Full-time">Full-time</option>
-                  <option value="Part-time">Part-time</option>
-                </select>
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Lokasi</label>
+                <label className={styles.label}>Judul Lowongan *</label>
                 <input
                   type="text"
                   className={styles.input}
-                  placeholder="Contoh: Jakarta (Remote)"
+                  placeholder="Contoh: Frontend Developer Intern"
+                  required
+                  value={formData.title}
+                  onChange={e => setFormData({ ...formData, title: e.target.value })}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Nama Perusahaan *</label>
+                <input
+                  type="text"
+                  className={styles.input}
+                  placeholder="Contoh: PT Tech Corp"
+                  required
+                  value={formData.company}
+                  onChange={e => setFormData({ ...formData, company: e.target.value })}
+                />
+              </div>
+            </div>
+
+            {/* Row 2: Location & Type */}
+            <div className={styles.row}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Lokasi *</label>
+                <input
+                  type="text"
+                  className={styles.input}
+                  placeholder="Contoh: Jakarta"
                   required
                   value={formData.location}
                   onChange={e => setFormData({ ...formData, location: e.target.value })}
                 />
               </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Tipe</label>
+                <select
+                  className={styles.select}
+                  value={formData.type}
+                  onChange={e => setFormData({ ...formData, type: e.target.value })}
+                >
+                  <option value="On-site">On-site</option>
+                  <option value="Remote">Remote</option>
+                  <option value="Hybrid">Hybrid</option>
+                </select>
+              </div>
             </div>
 
+            {/* Row 3: Duration & Level & Major */}
+            <div className={styles.row}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Durasi</label>
+                <select
+                  className={styles.select}
+                  value={formData.duration}
+                  onChange={e => setFormData({ ...formData, duration: e.target.value })}
+                >
+                  <option value="1-3 Bulan">1-3 Bulan</option>
+                  <option value="3-6 Bulan">3-6 Bulan</option>
+                  <option value="6 Bulan">6 Bulan</option>
+                  <option value="6-12 Bulan">6-12 Bulan</option>
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Level</label>
+                <select
+                  className={styles.select}
+                  value={formData.level}
+                  onChange={e => setFormData({ ...formData, level: e.target.value })}
+                >
+                  <option value="Internship">Internship</option>
+                  <option value="Junior">Junior</option>
+                  <option value="Entry Level">Entry Level</option>
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Jurusan</label>
+                <select
+                  className={styles.select}
+                  value={formData.major}
+                  onChange={e => setFormData({ ...formData, major: e.target.value })}
+                >
+                  <option value="Teknik Informatika">Teknik Informatika</option>
+                  <option value="Sistem Informasi">Sistem Informasi</option>
+                  <option value="Desain Komunikasi Visual">Desain Komunikasi Visual</option>
+                  <option value="Teknik Elektro">Teknik Elektro</option>
+                  <option value="Umum">Umum (Semua Jurusan)</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Description */}
             <div className={styles.formGroup}>
-              <label className={styles.label}>Deskripsi Pekerjaan</label>
+              <label className={styles.label}>Deskripsi Pekerjaan *</label>
               <textarea
                 className={styles.textarea}
                 placeholder="Jelaskan peran dan tanggung jawab magang ini..."
@@ -104,21 +190,48 @@ export function PostInternshipModal({ isOpen, onClose, onSuccess }: PostInternsh
               />
             </div>
 
+            {/* Skills Required */}
             <div className={styles.formGroup}>
-              <label className={styles.label}>Persyaratan (Gunakan baris baru untuk setiap poin)</label>
-              <textarea
-                className={styles.textarea}
-                placeholder="• Menguasai React.js&#10;• Paham CSS/Tailwind"
-                required
-                value={formData.requirements}
-                onChange={e => setFormData({ ...formData, requirements: e.target.value })}
+              <label className={styles.label}>Skills Required (pisahkan dengan koma)</label>
+              <input
+                type="text"
+                className={styles.input}
+                placeholder="Contoh: React, JavaScript, CSS, Git"
+                value={formData.skillsRequired}
+                onChange={e => setFormData({ ...formData, skillsRequired: e.target.value })}
               />
             </div>
+
+            {/* Requirements */}
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Persyaratan (pisahkan dengan baris baru)</label>
+              <textarea
+                className={styles.textarea}
+                placeholder={"Mahasiswa aktif semester 5-8\nMemiliki keahlian React\nBersedia magang minimal 3 bulan\nMemiliki motivasi belajar yang tinggi"}
+                value={formData.requirements}
+                onChange={e => setFormData({ ...formData, requirements: e.target.value })}
+                rows={4}
+              />
+            </div>
+
+            {/* Benefits */}
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Benefits (pisahkan dengan koma)</label>
+              <input
+                type="text"
+                className={styles.input}
+                placeholder="Sertifikat, Uang saku, Mentoring, Networking"
+                value={formData.benefits}
+                onChange={e => setFormData({ ...formData, benefits: e.target.value })}
+              />
+            </div>
+
+            {error && <p style={{ color: '#ef4444', fontSize: '13px', margin: '0' }}>{error}</p>}
 
             <div className={styles.actions}>
               <button type="button" className={styles.cancelBtn} onClick={onClose}>Batal</button>
               <button type="submit" className={styles.submitBtn} disabled={loading}>
-                {loading ? 'Memproses...' : 'Pasang Lowongan Sekarang'}
+                {loading ? 'Memproses...' : 'Pasang Lowongan'}
               </button>
             </div>
           </form>

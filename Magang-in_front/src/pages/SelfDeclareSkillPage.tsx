@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { skillService } from '../services/skill.service';
+import { aiService } from '../services/ai.service';
 import type { Skill } from '../types';
 import styles from './SelfDeclareSkillPage.module.css';
 
-const categories = ['All', 'Frontend', 'Backend', 'Data Science', 'AI', 'Design', 'Other'];
+const categories = ['All', 'Frontend', 'Backend', 'Data Science', 'DevOps', 'AI', 'Design', 'Other'];
 
 export function SelfDeclareSkillPage() {
   const navigate = useNavigate();
@@ -14,48 +15,19 @@ export function SelfDeclareSkillPage() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [fetchError, setFetchError] = useState('');
 
   useEffect(() => {
     const fetchSkills = async () => {
       try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 5000); // 5 detik timeout
         const response = await skillService.getAll();
-        clearTimeout(timeout);
         if (response.data && response.data.length > 0) {
           setSkills(response.data);
         } else {
-          throw new Error('empty');
+          setFetchError('Daftar skill kosong. Hubungi admin.');
         }
       } catch {
-        // Fallback: tampilkan skill dummy kalau API gagal
-        setSkills([
-          { id: '1', name: 'HTML', category: 'Frontend' },
-          { id: '2', name: 'CSS', category: 'Frontend' },
-          { id: '3', name: 'JavaScript', category: 'Frontend' },
-          { id: '4', name: 'React', category: 'Frontend' },
-          { id: '5', name: 'Vue.js', category: 'Frontend' },
-          { id: '6', name: 'Angular', category: 'Frontend' },
-          { id: '7', name: 'Node.js', category: 'Backend' },
-          { id: '8', name: 'Express', category: 'Backend' },
-          { id: '9', name: 'Python', category: 'Backend' },
-          { id: '10', name: 'Django', category: 'Backend' },
-          { id: '11', name: 'Flask', category: 'Backend' },
-          { id: '12', name: 'SQL', category: 'Backend' },
-          { id: '13', name: 'PostgreSQL', category: 'Backend' },
-          { id: '14', name: 'MongoDB', category: 'Backend' },
-          { id: '15', name: 'PHP', category: 'Backend' },
-          { id: '16', name: 'Laravel', category: 'Backend' },
-          { id: '17', name: 'UI/UX Design', category: 'Design' },
-          { id: '18', name: 'Figma', category: 'Design' },
-          { id: '19', name: 'Flutter', category: 'Frontend' },
-          { id: '20', name: 'Docker', category: 'Backend' },
-          { id: '21', name: 'AWS', category: 'Backend' },
-          { id: '22', name: 'TypeScript', category: 'Frontend' },
-          { id: '23', name: 'TensorFlow', category: 'AI' },
-          { id: '24', name: 'Go', category: 'Backend' },
-          { id: '25', name: 'Git', category: 'Other' },
-        ]);
+        setFetchError('Gagal memuat daftar skill. Periksa koneksi internet.');
       } finally {
         setIsLoading(false);
       }
@@ -84,9 +56,23 @@ export function SelfDeclareSkillPage() {
     if (selectedIds.length < 3) return;
     setIsSaving(true);
     try {
+      // 1. Sync skill IDs ke backend
       await skillService.sync(selectedIds);
-      sessionStorage.setItem('user_skills_for_match', JSON.stringify(selectedSkillNames));
-      navigate('/onboarding/matching');
+      
+      // 2. Normalize skill names via AI sebelum matching
+      let normalizedNames = selectedSkillNames;
+      try {
+        const normalizeRes = await aiService.normalizeSkills(selectedSkillNames);
+        if (normalizeRes.data.normalized && normalizeRes.data.normalized.length > 0) {
+          normalizedNames = normalizeRes.data.normalized.map(n => n.normalized || n.original);
+        }
+      } catch {
+        // Jika normalize gagal, pakai nama asli
+      }
+      
+      // 3. Simpan ke session untuk matching
+      sessionStorage.setItem('user_skills_for_match', JSON.stringify(normalizedNames));
+      navigate('/dashboard/rekomendasi');
     } catch {
       alert('Gagal menyimpan skill. Coba lagi.');
     } finally {
@@ -150,6 +136,8 @@ export function SelfDeclareSkillPage() {
         {/* Skill Grid */}
         {isLoading ? (
           <div className={styles.loading}>Memuat daftar skill...</div>
+        ) : fetchError ? (
+          <div className={styles.loading} style={{ color: '#ef4444' }}>{fetchError}</div>
         ) : (
           <div className={styles.grid}>
             {filteredSkills.map((skill) => (
@@ -193,7 +181,7 @@ export function SelfDeclareSkillPage() {
           )}
         </div>
         <div className={styles.footerRight}>
-          <button className={styles.backBtn} onClick={() => navigate('/onboarding')}>
+          <button className={styles.backBtn} onClick={() => navigate(-1)}>
             ← Kembali
           </button>
           <button

@@ -126,19 +126,24 @@ export interface ScanCVResponse {
   message: string
   extractedSkills: string[]
   confidence: number
+  raw?: Record<string, unknown>
 }
 
 export interface MatchResult {
   internshipId: string
+  id?: string
   title: string
   company: string
   matchScore: number
   missingSkills: string[]
   matched_skills?: string[]
+  missing_skills?: string[]
   match_category?: string
   roadmap_url?: string
   coverage_score?: number
   final_score?: number
+  similarity_score?: number
+  required_skills?: string[]
 }
 
 export interface MatchInternshipResponse {

@@ -32,14 +32,13 @@ export function DashboardPage() {
           setProfile(profileRes.value.data);
         }
 
-        // Try to get cached matches
+        // Try to get AI matches (backend will use DB skills if no cached skills)
         const cached = sessionStorage.getItem('user_skills_for_match');
-        if (cached) {
-          try {
-            const matchRes = await aiService.matchInternship(JSON.parse(cached));
-            setMatches(matchRes.data.matches.sort((a, b) => b.matchScore - a.matchScore).slice(0, 3));
-          } catch { /* ignore */ }
-        }
+        try {
+          const matchRes = await aiService.matchInternship(cached ? JSON.parse(cached) : undefined);
+          const rawMatches = matchRes.data.matches || [];
+          setMatches(rawMatches.sort((a, b) => b.matchScore - a.matchScore).slice(0, 3));
+        } catch { /* ignore */ }
       } catch (err) {
         console.error(err);
       }
