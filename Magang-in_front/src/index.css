@@ -17,6 +17,41 @@
   --bg-light: #f8fafc;
   --border: #e2e8f0;
   --sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Responsive spacing scale */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+  --spacing-3xl: 40px;
+  --spacing-4xl: 48px;
+
+  /* Responsive section padding */
+  --section-padding-x: 16px;
+  --section-padding-y: 24px;
+
+  /* Tap target minimum */
+  --tap-target-min: 44px;
+  --tap-spacing-min: 8px;
+
+  /* Container max-width */
+  --container-max: 1200px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --section-padding-x: 24px;
+    --section-padding-y: 48px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --section-padding-x: 24px;
+    --section-padding-y: 64px;
+  }
 }
 
 body {

@@ -126,7 +126,7 @@ export function AdminUserPage() {
           <tbody>
             {users.map(user => (
               <tr key={user.id}>
-                <td>
+                <td data-label="Nama & Email">
                   <div className={styles.userCell}>
                     <img src={user.avatar} alt={user.name} className={styles.avatar} />
                     <div>
@@ -135,19 +135,19 @@ export function AdminUserPage() {
                     </div>
                   </div>
                 </td>
-                <td>
+                <td data-label="Role">
                   <span className={`${styles.roleBadge} ${user.role === 'STUDENT' ? styles.roleStudent : styles.roleMitra}`}>
                     {user.role}
                   </span>
                 </td>
-                <td>{user.joined}</td>
-                <td>
+                <td data-label="Joined Date">{user.joined}</td>
+                <td data-label="Status">
                   <div className={styles.statusBadge}>
                     <div className={`${styles.statusDot} ${user.status === 'Active' ? styles.activeDot : styles.inactiveDot}`}></div>
                     {user.status}
                   </div>
                 </td>
-                <td>
+                <td data-label="Aksi">
                    <svg width="20" height="20" fill="none" stroke="#94a3b8" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
                 </td>
               </tr>

@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { internshipService } from '../services/internship.service';
+import { applicationService } from '../services/application.service';
 import { useAuth } from '../contexts/AuthContext';
 import type { Internship } from '../types';
 import styles from './DetailLowonganPage.module.css';
@@ -13,6 +14,15 @@ export function DetailLowonganPage() {
   const [error, setError] = useState('');
   const location = useLocation();
   const backLink = location.pathname.includes('/dashboard') ? '/dashboard/lowongan' : '/lowongan';
+
+  // Apply modal state
+  const [showApplyModal, setShowApplyModal] = useState(false);
+  const [coverLetter, setCoverLetter] = useState('');
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [applyLoading, setApplyLoading] = useState(false);
+  const [applyError, setApplyError] = useState('');
+  const [applySuccess, setApplySuccess] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchDetail = async () => {
     if (!id) return;
@@ -80,6 +90,60 @@ export function DetailLowonganPage() {
   const requirementsList = internship.requirements?.split('\n').map(r => r.trim()).filter(Boolean) || 
     internship.requirements?.split(',').map(r => r.trim()).filter(Boolean) || [];
 
+  // Handle file selection
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validasi: hanya PDF, max 5MB
+    if (file.type !== 'application/pdf') {
+      setApplyError('File harus berformat PDF.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setApplyError('Ukuran file maksimal 5MB.');
+      return;
+    }
+
+    setApplyError('');
+    setCvFile(file);
+  };
+
+  // Handle submit lamaran
+  const handleApply = async () => {
+    if (!id) return;
+
+    setApplyLoading(true);
+    setApplyError('');
+
+    try {
+      await applicationService.apply(id, coverLetter || undefined, cvFile || undefined);
+      setApplySuccess(true);
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosErr = err as { response?: { data?: { message?: string } } };
+        const msg = axiosErr.response?.data?.message || '';
+        if (msg.toLowerCase().includes('sudah') || msg.toLowerCase().includes('already')) {
+          setApplyError('Kamu sudah pernah melamar di lowongan ini.');
+        } else {
+          setApplyError(msg || 'Gagal mengirim lamaran. Coba lagi.');
+        }
+      } else {
+        setApplyError('Tidak dapat terhubung ke server.');
+      }
+    } finally {
+      setApplyLoading(false);
+    }
+  };
+
+  // Reset modal state
+  const closeApplyModal = () => {
+    setShowApplyModal(false);
+    setCoverLetter('');
+    setCvFile(null);
+    setApplyError('');
+  };
+
   return (
     <div className={styles.page}>
       {/* Header */}
@@ -101,7 +165,13 @@ export function DetailLowonganPage() {
           </div>
         </div>
         {isAuthenticated && user?.role === 'pengguna' && (
-          <button className={styles.applyBtn}>Lamar Sekarang</button>
+          <button 
+            className={styles.applyBtn} 
+            onClick={() => setShowApplyModal(true)}
+            disabled={applySuccess}
+          >
+            {applySuccess ? '✓ Lamaran Terkirim' : 'Lamar Sekarang'}
+          </button>
         )}
       </div>
 
@@ -225,6 +295,104 @@ export function DetailLowonganPage() {
           )}
         </div>
       </div>
+
+      {/* Apply Modal */}
+      {showApplyModal && (
+        <div className={styles.modalOverlay} onClick={closeApplyModal}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>Lamar Magang</h2>
+              <button className={styles.modalClose} onClick={closeApplyModal}>
+                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className={styles.modalBody}>
+              <p className={styles.modalJobTitle}>{internship.title} — {internship.company}</p>
+
+              {/* Upload CV */}
+              <div className={styles.modalField}>
+                <label className={styles.modalLabel}>Upload CV (PDF, maks 5MB)</label>
+                <div 
+                  className={styles.uploadArea}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf"
+                    onChange={handleFileChange}
+                    style={{ display: 'none' }}
+                  />
+                  {cvFile ? (
+                    <div className={styles.fileSelected}>
+                      <svg width="20" height="20" fill="none" stroke="#6366f1" strokeWidth="2" viewBox="0 0 24 24">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                      </svg>
+                      <span>{cvFile.name}</span>
+                      <button 
+                        className={styles.removeFileBtn}
+                        onClick={(e) => { e.stopPropagation(); setCvFile(null); }}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    <div className={styles.uploadPlaceholder}>
+                      <svg width="24" height="24" fill="none" stroke="#94a3b8" strokeWidth="2" viewBox="0 0 24 24">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
+                      </svg>
+                      <span>Klik untuk upload CV</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Cover Letter */}
+              <div className={styles.modalField}>
+                <label className={styles.modalLabel}>Cover Letter (opsional)</label>
+                <textarea
+                  className={styles.modalTextarea}
+                  placeholder="Ceritakan mengapa kamu cocok untuk posisi ini..."
+                  value={coverLetter}
+                  onChange={(e) => setCoverLetter(e.target.value)}
+                  rows={4}
+                />
+              </div>
+
+              {/* Error */}
+              {applyError && (
+                <div className={styles.modalError}>{applyError}</div>
+              )}
+
+              {/* Success */}
+              {applySuccess && (
+                <div className={styles.modalSuccess}>
+                  ✓ Lamaran berhasil dikirim! Kamu bisa cek statusnya di halaman Lamaran.
+                </div>
+              )}
+            </div>
+
+            <div className={styles.modalFooter}>
+              <button className={styles.modalCancelBtn} onClick={closeApplyModal}>
+                Batal
+              </button>
+              <button 
+                className={styles.modalSubmitBtn} 
+                onClick={handleApply}
+                disabled={applyLoading || applySuccess}
+              >
+                {applyLoading ? 'Mengirim...' : applySuccess ? '✓ Terkirim' : 'Kirim Lamaran'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,13 +1,7 @@
+import { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import styles from './DashboardLayout.module.css';
-
-const menuItems = [
-  { path: '/dashboard', label: 'Dashboard', icon: 'grid' },
-  { path: '/dashboard/lowongan', label: 'Lowongan', icon: 'briefcase' },
-  { path: '/dashboard/rekomendasi', label: 'Rekomendasi AI', icon: 'sparkle' },
-  { path: '/dashboard/roadmap', label: 'Roadmap', icon: 'code' },
-];
 
 function MenuIcon({ name }: { name: string }) {
   switch (name) {
@@ -31,44 +25,92 @@ function MenuIcon({ name }: { name: string }) {
 export function DashboardLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Close sidebar on navigation (mobile)
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [location.pathname]);
+
+  // Define menu items based on role
+  const getMenuItems = () => {
+    if (user?.role === 'admin') {
+      return [
+        { path: '/admin/dashboard', label: 'Beranda', icon: 'grid' },
+        { path: '/admin/users', label: 'Manajemen User', icon: 'user' },
+        { path: '/admin/verifikasi', label: 'Verifikasi Mitra', icon: 'document' },
+        { path: '/admin/lowongan', label: 'Kelola Lowongan', icon: 'briefcase' },
+        { path: '/admin/laporan', label: 'Laporan & Data', icon: 'sparkle' },
+      ];
+    }
+    if (user?.role === 'mitra') {
+      return [
+        { path: '/mitra/dashboard', label: 'Beranda', icon: 'grid' },
+        { path: '/mitra/lowongan', label: 'Lowongan Saya', icon: 'briefcase' },
+        { path: '/mitra/pelamar', label: 'Kelola Pelamar', icon: 'user' },
+      ];
+    }
+    // Default Student
+    return [
+      { path: '/dashboard', label: 'Dashboard', icon: 'grid' },
+      { path: '/dashboard/lowongan', label: 'Lowongan', icon: 'briefcase' },
+      { path: '/dashboard/rekomendasi', label: 'Rekomendasi AI', icon: 'sparkle' },
+      { path: '/dashboard/roadmap', label: 'Roadmap', icon: 'code' },
+    ];
+  };
+
+  const menuItems = getMenuItems();
 
   return (
     <div className={styles.layout}>
+      {/* Mobile Top Bar */}
+      <div className={styles.mobileTopBar}>
+        <button 
+          className={styles.menuToggle}
+          onClick={() => setIsSidebarOpen(true)}
+          aria-label="Open sidebar"
+        >
+          <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+        <div className={styles.mobileBrand}>Magang-in</div>
+        <div className={styles.mobileActions}>
+           <img src={`https://ui-avatars.com/api/?name=${user?.name}&background=6366f1&color=fff`} alt="Profile" className={styles.miniAvatar} />
+        </div>
+      </div>
+
+      {/* Backdrop for Mobile */}
+      {isSidebarOpen && (
+        <div 
+          className={styles.backdrop} 
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className={styles.sidebar}>
+      <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.sidebarOpen : ''}`}>
         <div className={styles.brand}>
           <span className={styles.brandName}>Magang-in</span>
           <span className={styles.brandSub}>AI INTERNSHIP PLATFORM</span>
         </div>
-
+      
         <nav className={styles.nav}>
           {menuItems.map((item) => (
-            'external' in item && item.external ? (
-              <a
-                key={item.path}
-                href={item.path}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.navItem}
-              >
-                <MenuIcon name={item.icon} />
-                <span>{item.label}</span>
-              </a>
-            ) : (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={location.pathname === item.path ? styles.navItemActive : styles.navItem}
-              >
-                <MenuIcon name={item.icon} />
-                <span>{item.label}</span>
-              </Link>
-            )
+            <Link
+              key={item.path}
+              to={item.path}
+              className={location.pathname === item.path ? styles.navItemActive : styles.navItem}
+              onClick={() => setIsSidebarOpen(false)}
+            >
+              <MenuIcon name={item.icon} />
+              <span>{item.label}</span>
+            </Link>
           ))}
         </nav>
 
         <div className={styles.sidebarBottom}>
-          <Link to="/dashboard/profil" className={styles.userInfo}>
+          <Link to={user?.role === 'pengguna' ? "/dashboard/profil" : "#"} className={styles.userInfo}>
             <div className={styles.userAvatar}>
               {user?.name?.charAt(0).toUpperCase() || 'U'}
             </div>

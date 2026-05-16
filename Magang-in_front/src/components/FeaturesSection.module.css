@@ -201,9 +201,15 @@
     transform: translateY(-2px);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
     .topRow {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .section {
+        padding: 80px 20px;
     }
 
     .bottomRow {
@@ -212,5 +218,20 @@
 
     .title {
         font-size: 28px;
+    }
+
+    .skillRow {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .skillName {
+        width: 100%;
+    }
+
+    .skillLevel {
+        width: 100%;
+        text-align: left;
     }
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import styles from './Navbar.module.css';
@@ -7,6 +7,12 @@ export function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location]);
 
   // Tentukan link aktif
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
@@ -30,7 +36,20 @@ export function Navbar() {
           <span className={styles.logoAccent}>-in</span>
         </Link>
 
-        {/* Nav Links */}
+        {/* Hamburger toggle button (visible on mobile/tablet, hidden on desktop) */}
+        <button
+          className={styles.hamburger}
+          data-testid="hamburger-btn"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={isMobileMenuOpen}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+
+        {/* Nav Links (desktop only) */}
         <ul className={styles.navLinks}>
           <li>
             <Link to="/lowongan" className={isActive('/lowongan') ? styles.navLinkActive : styles.navLink}>
@@ -102,6 +121,69 @@ export function Navbar() {
             </>
           )}
         </div>
+      </div>
+
+      {/* Mobile menu overlay backdrop */}
+      {isMobileMenuOpen && (
+        <div
+          className={styles.mobileOverlay}
+          onClick={() => setIsMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Mobile menu panel */}
+      <div className={`${styles.mobileMenu} ${isMobileMenuOpen ? styles.mobileMenuOpen : ''}`}>
+        <Link
+          to="/lowongan"
+          className={styles.mobileNavLink}
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          Lowongan
+        </Link>
+        <Link
+          to="/perusahaan"
+          className={styles.mobileNavLink}
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          Perusahaan
+        </Link>
+        {isAuthenticated && user && (
+          <>
+            <Link
+              to={getDashboardUrl()}
+              className={styles.mobileNavLink}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Dashboard
+            </Link>
+            <Link
+              to="/profile"
+              className={styles.mobileNavLink}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Profile
+            </Link>
+          </>
+        )}
+        {!isAuthenticated && (
+          <>
+            <Link
+              to="/login"
+              className={styles.mobileNavLink}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Masuk
+            </Link>
+            <Link
+              to="/register"
+              className={styles.mobileNavLink}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Daftar
+            </Link>
+          </>
+        )}
       </div>
     </nav>
   );

@@ -221,3 +221,27 @@
 .pageNav { display: flex; gap: 8px; align-items: center; }
 .pageBtn { width: 32px; height: 32px; border: 1px solid #e2e8f0; border-radius: 8px; background: white; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .pageBtnActive { background: #3730a3; color: white; border-color: #3730a3; }
+
+@media (max-width: 1024px) {
+  .statsGrid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .topHeader { flex-direction: column; gap: 20px; align-items: flex-start; }
+  .searchWrapper { width: 100%; }
+  .pageHeader { flex-direction: column; align-items: flex-start; gap: 20px; }
+  .headerActions { width: 100%; flex-direction: column; }
+  .exportBtn, .addBtn { width: 100%; justify-content: center; }
+  .alertBanner { flex-direction: column; gap: 20px; align-items: flex-start; }
+  .statsGrid { grid-template-columns: 1fr; }
+  .filterBar { flex-direction: column; }
+  .selectFilter { width: 100%; }
+
+  /* Table to Card Pattern */
+  .table, .table thead, .table tbody, .table tr, .table th, .table td { display: block; }
+  .table thead { display: none; }
+  .table tr { padding: 16px; border-bottom: 1px solid #e2e8f0; }
+  .table td { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
+  .table td:last-child { border-bottom: none; }
+  .pagination { flex-direction: column; gap: 16px; }
+}

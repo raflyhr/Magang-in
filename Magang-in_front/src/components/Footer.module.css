@@ -131,7 +131,8 @@
     color: #94a3b8;
 }
 
-@media (max-width: 900px) {
+
+@media (max-width: 1024px) {
     .top {
         grid-template-columns: 1fr 1fr;
     }
@@ -141,13 +142,23 @@
     }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
+    .footer {
+        padding: 60px 20px 32px;
+    }
+
     .top {
         grid-template-columns: 1fr;
+        gap: 40px;
     }
 
     .bottom {
         flex-direction: column;
         text-align: center;
+        gap: 20px;
+    }
+
+    .bottomRight {
+        justify-content: center;
     }
 }

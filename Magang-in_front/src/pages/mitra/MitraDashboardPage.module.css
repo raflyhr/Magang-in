@@ -341,14 +341,46 @@
 
 .aiTipText b { font-weight: 700; }
 
+
 @media (max-width: 1024px) {
-  .contentGrid {
-    grid-template-columns: 1fr;
-  }
+  .contentGrid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 768px) {
+  .topNav { display: none; }
+
+  .header {
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+    padding: 0;
+  }
+
+  .welcomeTitle { font-size: 24px; }
+
+  .matchAvg {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 16px;
+  }
+
   .statsGrid {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
+
+  .statCard { padding: 20px; }
+
+  .activityItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+  }
+
+  .activityInfo { width: 100%; }
+
+  .reviewBtn { width: 100%; }
 }

@@ -96,34 +96,34 @@ export function AdminDashboardPage() {
             </thead>
             <tbody>
               <tr>
-                <td>
+                <td data-label="Nama Perusahaan">
                   <div className={styles.companyInfo}>
                     <div className={styles.companyLogo} style={{ color: '#6366f1' }}>TN</div>
                     <b>TechNova Solutions</b>
                   </div>
                 </td>
-                <td>12 Okt 2023</td>
-                <td><button className={styles.cekBtn}>Cek Dokumen</button></td>
+                <td data-label="Tanggal Daftar">12 Okt 2023</td>
+                <td data-label="Aksi"><button className={styles.cekBtn}>Cek Dokumen</button></td>
               </tr>
               <tr>
-                <td>
+                <td data-label="Nama Perusahaan">
                   <div className={styles.companyInfo}>
                     <div className={styles.companyLogo} style={{ color: '#0ea5e9' }}>GC</div>
                     <b>GreenCloud Inc.</b>
                   </div>
                 </td>
-                <td>13 Okt 2023</td>
-                <td><button className={styles.cekBtn}>Cek Dokumen</button></td>
+                <td data-label="Tanggal Daftar">13 Okt 2023</td>
+                <td data-label="Aksi"><button className={styles.cekBtn}>Cek Dokumen</button></td>
               </tr>
               <tr>
-                <td>
+                <td data-label="Nama Perusahaan">
                   <div className={styles.companyInfo}>
                     <div className={styles.companyLogo} style={{ color: '#f97316' }}>SA</div>
                     <b>Synergi Analytics</b>
                   </div>
                 </td>
-                <td>14 Okt 2023</td>
-                <td><button className={styles.cekBtn}>Cek Dokumen</button></td>
+                <td data-label="Tanggal Daftar">14 Okt 2023</td>
+                <td data-label="Aksi"><button className={styles.cekBtn}>Cek Dokumen</button></td>
               </tr>
             </tbody>
           </table>

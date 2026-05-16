@@ -79,11 +79,20 @@
 }
 
 @media (max-width: 768px) {
+    .section {
+        padding: 60px 20px;
+    }
+
     .card {
         padding: 60px 24px;
+        border-radius: 20px;
     }
 
     .title {
         font-size: 28px;
+    }
+
+    .btn {
+        width: 100%;
     }
 }

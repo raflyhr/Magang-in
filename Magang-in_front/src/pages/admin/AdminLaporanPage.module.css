@@ -10,8 +10,18 @@
   margin-bottom: 32px;
 }
 
-.title { font-size: 28px; font-weight: 800; color: #1e293b; margin: 0 0 8px; }
-.desc { font-size: 14px; color: #64748b; margin: 0; }
+.title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 8px;
+}
+
+.desc {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
 
 .headerActions {
   display: flex;
@@ -95,7 +105,11 @@
   gap: 6px;
 }
 
-.dot { width: 8px; height: 8px; border-radius: 50%; }
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
 
 /* Bar Chart */
 .barChartContainer {
@@ -123,9 +137,17 @@
   transition: opacity 0.2s;
 }
 
-.barSiswa { background: #cbd5e1; }
-.barLowongan { background: #3730a3; }
-.barActive { background: #1e1b4b; }
+.barSiswa {
+  background: #cbd5e1;
+}
+
+.barLowongan {
+  background: #3730a3;
+}
+
+.barActive {
+  background: #1e1b4b;
+}
 
 .monthLabel {
   margin-top: 16px;
@@ -159,8 +181,18 @@
   text-align: center;
 }
 
-.percentText { font-size: 36px; font-weight: 800; display: block; }
-.percentSub { font-size: 10px; font-weight: 700; opacity: 0.8; text-transform: uppercase; }
+.percentText {
+  font-size: 36px;
+  font-weight: 800;
+  display: block;
+}
+
+.percentSub {
+  font-size: 10px;
+  font-weight: 700;
+  opacity: 0.8;
+  text-transform: uppercase;
+}
 
 .matchInfo {
   width: 100%;
@@ -248,8 +280,19 @@
   color: #6366f1;
 }
 
-.miniVal { font-size: 16px; font-weight: 800; color: #1e293b; display: block; }
-.miniLabel { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
+.miniVal {
+  font-size: 16px;
+  font-weight: 800;
+  color: #1e293b;
+  display: block;
+}
+
+.miniLabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
 
 .infoBox {
   background: #eff6ff;
@@ -261,8 +304,15 @@
   margin-bottom: 24px;
 }
 
-.infoText { font-size: 13px; color: #1e40af; line-height: 1.5; }
-.infoText b { color: #1e3a8a; }
+.infoText {
+  font-size: 13px;
+  color: #1e40af;
+  line-height: 1.5;
+}
+
+.infoText b {
+  color: #1e3a8a;
+}
 
 .visualPreview {
   width: 100%;
@@ -273,4 +323,93 @@
   background-size: cover;
   background-position: center;
   opacity: 0.8;
+}
+
+
+/* Responsive - Tablet */
+@media (max-width: 1024px) {
+  .chartsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .bottomGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .headerRow {
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .headerActions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .timeFilter {
+    width: 100%;
+  }
+
+  .filterBtn {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+/* Responsive - Mobile */
+@media (max-width: 768px) {
+  .card {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .cardTitle {
+    font-size: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .legend {
+    flex-wrap: wrap;
+  }
+
+  .barChartContainer {
+    height: 200px;
+    overflow-x: auto;
+    padding-bottom: 32px;
+  }
+
+  .barGroup {
+    min-width: 40px;
+  }
+
+  .bar {
+    width: 24px;
+  }
+
+  .insightStats {
+    grid-template-columns: 1fr;
+  }
+
+  .radialBox {
+    width: 140px;
+    height: 140px;
+  }
+
+  .percentText {
+    font-size: 28px;
+  }
+
+  .matchInfo {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .datePicker {
+    width: 100%;
+    justify-content: center;
+  }
 }

@@ -286,3 +286,62 @@
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+
+/* Responsive - Tablet */
+@media (max-width: 768px) {
+    .page {
+        padding: 24px 16px;
+        justify-content: flex-start;
+        padding-top: 60px;
+    }
+
+    .topBackBtn {
+        position: static;
+        margin-bottom: 16px;
+        align-self: flex-start;
+    }
+
+    .title {
+        font-size: 22px;
+    }
+
+    .subtitle {
+        margin-bottom: 24px;
+    }
+
+    .uploadZone {
+        padding: 36px 16px;
+        border-radius: 12px;
+    }
+
+    .uploadBtn {
+        width: 100%;
+        min-height: 48px;
+        font-size: 16px;
+    }
+
+    .footer {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .backBtn,
+    .nextBtn {
+        width: 100%;
+        min-height: 48px;
+        font-size: 16px;
+    }
+
+    .chip {
+        font-size: 12px;
+        padding: 5px 12px;
+    }
+
+    .backLink {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}

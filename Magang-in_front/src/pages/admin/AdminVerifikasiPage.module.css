@@ -332,3 +332,18 @@
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
   cursor: pointer;
 }
+
+@media (max-width: 1024px) {
+  .headerRow { flex-direction: column; gap: 20px; align-items: flex-start; }
+  .trustScoreCard { width: 100%; }
+  .bottomGrid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .topNav { flex-direction: column; gap: 16px; align-items: flex-start; }
+  .searchWrapper { width: 100%; }
+  .mitraCard { display: flex; flex-direction: column; gap: 16px; padding: 20px; }
+  .companyInfo { width: 100%; }
+  .reviewBtn { width: 100%; }
+  .tabs { overflow-x: auto; white-space: nowrap; }
+}

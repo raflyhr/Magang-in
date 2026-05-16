@@ -3,6 +3,7 @@ import { Navbar } from './components/Navbar';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { RedirectIfAuth } from './components/RedirectIfAuth';
 import { DashboardLayout } from './components/DashboardLayout';
+import { ChatbotWidget } from './components/ChatbotWidget';
 import { HeroSection } from './components/HeroSection';
 import { FeaturesSection } from './components/FeaturesSection';
 import { CTASection } from './components/CTASection';
@@ -114,6 +115,9 @@ function App() {
         <Route path="/onboarding/upload-cv" element={<UploadCVPage />} />
         <Route path="/onboarding/matching" element={<MatchingResultPage />} />
       </Routes>
+
+      {/* Chatbot Widget — muncul di semua halaman publik & user */}
+      <ChatbotWidget />
     </BrowserRouter>
   );
 }

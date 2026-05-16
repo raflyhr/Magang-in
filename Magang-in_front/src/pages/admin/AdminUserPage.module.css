@@ -364,3 +364,30 @@
   color: #475569;
   line-height: 1.6;
 }
+
+
+@media (max-width: 1024px) {
+  .statsGrid { grid-template-columns: repeat(2, 1fr); }
+  .insightGrid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .topHeader { flex-direction: column; gap: 20px; align-items: flex-start; }
+  .searchWrapper { width: 100%; }
+  .pageInfo { flex-direction: column; align-items: flex-start; gap: 20px; }
+  .addBtn { width: 100%; }
+  .statsGrid { grid-template-columns: 1fr; }
+  .tableControls { flex-direction: column; gap: 16px; align-items: flex-start; }
+  .tabs { width: 100%; overflow-x: auto; }
+  .tab { flex: 1; white-space: nowrap; }
+
+  /* Table to Card Pattern */
+  .table, .table thead, .table tbody, .table tr, .table th, .table td { display: block; }
+  .table thead { display: none; }
+  .table tr { padding: 16px; border-bottom: 1px solid #e2e8f0; }
+  .table td { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; text-align: right; }
+  .table td::before { content: attr(data-label); font-weight: 700; color: #64748b; font-size: 12px; text-transform: uppercase; margin-right: 16px; text-align: left; }
+  .table td:last-child { border-bottom: none; }
+  .userCell { flex-direction: row; text-align: right; }
+  .pagination { flex-direction: column; gap: 16px; text-align: center; }
+}

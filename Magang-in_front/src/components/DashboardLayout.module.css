@@ -1,21 +1,65 @@
 .layout {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
 }
 
-/* Sidebar */
-.sidebar {
-  width: 260px;
-  background: #fafbfc;
-  border-right: 1px solid #e2e8f0;
+/* Mobile Top Bar */
+.mobileTopBar {
   display: flex;
-  flex-direction: column;
-  padding: 24px 16px;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  padding: 0 16px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.menuToggle {
+  background: none;
+  border: none;
+  color: #1e293b;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.mobileBrand {
+  font-weight: 800;
+  color: #6366f1;
+  font-size: 18px;
+}
+
+/* Sidebar Drawer for Mobile */
+.sidebar {
   position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
+  width: 280px;
+  background: white;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  z-index: 50;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.sidebarOpen {
+  transform: translateX(0);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
   z-index: 40;
+  backdrop-filter: blur(2px);
 }
 
 .brand {
@@ -158,17 +202,50 @@
 /* Main Content */
 .content {
   flex: 1;
-  margin-left: 260px;
-  padding: 32px 40px;
+  padding: 24px 16px;
   background: #f8fafc;
   min-height: 100vh;
+  overflow-y: auto;
 }
 
-@media (max-width: 768px) {
-  .sidebar {
+/* Desktop (≥1024px) */
+@media (min-width: 1024px) {
+  .layout {
+    flex-direction: row;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .mobileTopBar {
     display: none;
   }
-  .content {
-    margin-left: 0;
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    width: 260px;
+    height: 100vh;
+    overflow-y: auto;
+    transform: translateX(0);
+    transition: none;
+    flex-shrink: 0;
   }
+
+  .content {
+    padding: 32px 40px;
+    height: 100vh;
+    overflow-y: auto;
+  }
+}
+
+.mobileActions {
+  display: flex;
+  align-items: center;
+}
+
+.miniAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid #eef2ff;
 }

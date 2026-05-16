@@ -300,3 +300,87 @@
 .roadmapLink:hover {
     text-decoration: underline;
 }
+
+
+/* Responsive - Tablet */
+@media (max-width: 1024px) {
+    .container {
+        max-width: 100%;
+    }
+}
+
+/* Responsive - Mobile */
+@media (max-width: 768px) {
+    .page {
+        padding: 24px 16px;
+    }
+
+    .title {
+        font-size: 22px;
+    }
+
+    .card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px;
+    }
+
+    .cardLeft {
+        flex-direction: row;
+        width: 100%;
+        justify-content: flex-start;
+        gap: 12px;
+        min-width: unset;
+    }
+
+    .cardRight {
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+        min-width: unset;
+        padding-top: 12px;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .score {
+        font-size: 22px;
+    }
+
+    .cardTitle {
+        font-size: 15px;
+    }
+
+    .footerActions {
+        flex-direction: column;
+    }
+
+    .browseBtn,
+    .dashboardBtn {
+        width: 100%;
+        text-align: center;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .userSkills {
+        gap: 4px;
+    }
+
+    .userSkillChip {
+        font-size: 11px;
+        padding: 3px 8px;
+    }
+
+    .changeBtn {
+        min-height: 44px;
+    }
+
+    .missingSkills,
+    .matchedSkills {
+        margin-top: 4px;
+    }
+}

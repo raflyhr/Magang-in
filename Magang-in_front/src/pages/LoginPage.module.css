@@ -388,7 +388,11 @@
     color: #64748b;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 768px) {
+    .page {
+        padding: 20px 16px;
+    }
+
     .card {
         grid-template-columns: 1fr;
     }
@@ -398,11 +402,25 @@
     }
 
     .right {
-        padding: 40px 28px;
+        padding: 40px 24px;
+    }
+
+    .title {
+        font-size: 24px;
+    }
+
+    .socialBtns {
+        grid-template-columns: 1fr;
     }
 
     .pageFooter {
         flex-direction: column;
         text-align: center;
+        gap: 16px;
+    }
+
+    .backBtn {
+        position: static;
+        margin-bottom: 20px;
     }
 }
