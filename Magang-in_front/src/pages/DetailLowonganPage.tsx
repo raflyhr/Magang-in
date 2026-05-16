@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { internshipService } from '../services/internship.service';
 import { useAuth } from '../contexts/AuthContext';
 import type { Internship } from '../types';
@@ -11,6 +11,8 @@ export function DetailLowonganPage() {
   const [internship, setInternship] = useState<Internship | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const location = useLocation();
+  const backLink = location.pathname.includes('/dashboard') ? '/dashboard/lowongan' : '/lowongan';
 
   const fetchDetail = async () => {
     if (!id) return;
@@ -55,7 +57,7 @@ export function DetailLowonganPage() {
       <div className={styles.errorContainer}>
         <h2>Lowongan Tidak Ditemukan</h2>
         <p>Lowongan yang kamu cari tidak ada atau sudah ditutup.</p>
-        <Link to="/lowongan" className={styles.backBtn}>Kembali ke Daftar Lowongan</Link>
+        <Link to={backLink} className={styles.backBtn}>Kembali ke Daftar Lowongan</Link>
       </div>
     );
   }

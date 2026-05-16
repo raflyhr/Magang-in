@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { RedirectIfAuth } from './components/RedirectIfAuth';
+import { DashboardLayout } from './components/DashboardLayout';
 import { HeroSection } from './components/HeroSection';
 import { FeaturesSection } from './components/FeaturesSection';
 import { CTASection } from './components/CTASection';
@@ -15,8 +17,22 @@ import { MatchingResultPage } from './pages/MatchingResultPage';
 import { LowonganPage } from './pages/LowonganPage';
 import { DetailLowonganPage } from './pages/DetailLowonganPage';
 import { PerusahaanPage } from './pages/PerusahaanPage';
+import { DashboardPage } from './pages/DashboardPage';
+import { RoadmapPage } from './pages/RoadmapPage';
+import { ProfilPage } from './pages/ProfilPage';
+import { MitraLayout } from './pages/mitra/MitraLayout';
+import { MitraDashboardPage } from './pages/mitra/MitraDashboardPage';
+import { MitraLowonganPage } from './pages/mitra/MitraLowonganPage';
+import { MitraReviewPage } from './pages/mitra/MitraReviewPage';
+import { MitraProfilPage } from './pages/mitra/MitraProfilPage';
+import { AdminLayout } from './pages/admin/AdminLayout';
+import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
+import { AdminUserPage } from './pages/admin/AdminUserPage';
+import { AdminVerifikasiPage } from './pages/admin/AdminVerifikasiPage';
+import { AdminLowonganPage } from './pages/admin/AdminLowonganPage';
+import { AdminLaporanPage } from './pages/admin/AdminLaporanPage';
 
-// Layout dengan Navbar + Footer (untuk halaman umum)
+// Layout publik dengan Navbar + Footer
 function MainLayout() {
   return (
     <>
@@ -42,37 +58,56 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Halaman publik dengan Navbar + Footer */}
+        {/* Halaman publik — redirect ke dashboard kalau sudah login HANYA untuk login/register */}
+        <Route element={<RedirectIfAuth />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Route>
+
+        {/* Halaman publik yang bisa diakses oleh siapa saja (login/belum login) */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<LandingContent />} />
+          <Route path="/perusahaan" element={<PerusahaanPage />} />
           <Route path="/lowongan" element={<LowonganPage />} />
           <Route path="/lowongan/:id" element={<DetailLowonganPage />} />
-          <Route path="/perusahaan" element={<PerusahaanPage />} />
+        </Route>
 
-          {/* Protected: hanya role "pengguna" */}
-          <Route element={<ProtectedRoute allowedRoles={['pengguna']} />}>
-            <Route path="/dashboard" element={<div style={{ padding: '80px 24px', textAlign: 'center' }}><h2>Dashboard Pengguna</h2><p>Halaman ini sedang dalam pengembangan.</p></div>} />
-          </Route>
-
-          {/* Protected: hanya role "mitra" */}
-          <Route element={<ProtectedRoute allowedRoles={['mitra']} />}>
-            <Route path="/mitra/dashboard" element={<div style={{ padding: '80px 24px', textAlign: 'center' }}><h2>Dashboard Mitra</h2><p>Halaman ini sedang dalam pengembangan.</p></div>} />
-          </Route>
-
-          {/* Protected: hanya role "admin" */}
-          <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-            <Route path="/admin/dashboard" element={<div style={{ padding: '80px 24px', textAlign: 'center' }}><h2>Dashboard Admin</h2><p>Halaman ini sedang dalam pengembangan.</p></div>} />
-          </Route>
-
-          {/* Protected: semua user yang sudah login */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/profile" element={<div style={{ padding: '80px 24px', textAlign: 'center' }}><h2>Profile</h2><p>Halaman ini sedang dalam pengembangan.</p></div>} />
+        {/* Halaman dashboard pengguna (protected) */}
+        <Route element={<ProtectedRoute allowedRoles={['pengguna']} />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/dashboard/lowongan" element={<LowonganPage />} />
+            <Route path="/dashboard/lowongan/:id" element={<DetailLowonganPage />} />
+            <Route path="/dashboard/rekomendasi" element={<MatchingResultPage />} />
+            <Route path="/dashboard/roadmap" element={<RoadmapPage />} />
+            <Route path="/dashboard/profil" element={<ProfilPage />} />
           </Route>
         </Route>
 
-        {/* Halaman tanpa Navbar (punya layout sendiri) */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        {/* Dashboard Mitra (protected) */}
+        <Route element={<ProtectedRoute allowedRoles={['mitra']} />}>
+          <Route element={<MitraLayout />}>
+            <Route path="/mitra" element={<MitraDashboardPage />} />
+            <Route path="/mitra/dashboard" element={<MitraDashboardPage />} />
+            <Route path="/mitra/lowongan" element={<MitraLowonganPage />} />
+            <Route path="/mitra/pelamar" element={<MitraReviewPage />} />
+            <Route path="/mitra/profil" element={<MitraProfilPage />} />
+          </Route>
+        </Route>
+
+        {/* Dashboard Admin (protected) */}
+        <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin" element={<AdminDashboardPage />} />
+            <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+            <Route path="/admin/users" element={<AdminUserPage />} />
+            <Route path="/admin/verifikasi" element={<AdminVerifikasiPage />} />
+            <Route path="/admin/lowongan" element={<AdminLowonganPage />} />
+            <Route path="/admin/laporan" element={<AdminLaporanPage />} />
+          </Route>
+        </Route>
+
+        {/* Halaman onboarding (tanpa layout, protected) */}
         <Route path="/auth/google/callback" element={<OAuthCallbackPage />} />
         <Route path="/onboarding" element={<OnboardingPage />} />
         <Route path="/onboarding/self-declare" element={<SelfDeclareSkillPage />} />

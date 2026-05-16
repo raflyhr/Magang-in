@@ -134,13 +134,9 @@
     background: #3730a3;
 }
 
-/* Main layout */
 .main {
     max-width: 1200px;
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: 220px 1fr;
-    gap: 24px;
     padding: 24px;
 }
 

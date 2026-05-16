@@ -4,7 +4,12 @@ import { aiService } from '../services/ai.service';
 import type { MatchResult } from '../types';
 import styles from './MatchingResultPage.module.css';
 
-function getMatchLevel(score: number) {
+function getMatchLevel(match: MatchResult) {
+  if (match.match_category === 'Strong Match') return { label: 'STRONG', color: '#22c55e', bg: '#ecfdf5' };
+  if (match.match_category === 'Partial Match') return { label: 'PARTIAL', color: '#f59e0b', bg: '#fffbeb' };
+  if (match.match_category === 'Low Match') return { label: 'LOW', color: '#ef4444', bg: '#fef2f2' };
+  
+  const score = match.coverage_score ? match.coverage_score * 100 : match.matchScore;
   if (score >= 70) return { label: 'STRONG', color: '#22c55e', bg: '#ecfdf5' };
   if (score >= 40) return { label: 'PARTIAL', color: '#f59e0b', bg: '#fffbeb' };
   return { label: 'LOW', color: '#ef4444', bg: '#fef2f2' };
@@ -92,7 +97,7 @@ export function MatchingResultPage() {
         {!isLoading && !error && matches.length > 0 && (
           <div className={styles.results}>
             {matches.map((match, i) => {
-              const level = getMatchLevel(match.matchScore);
+              const level = getMatchLevel(match);
               return (
                 <div key={match.internshipId} className={styles.card} style={{ borderLeftColor: level.color }}>
                   <div className={styles.cardLeft}>
@@ -104,6 +109,14 @@ export function MatchingResultPage() {
                   <div className={styles.cardContent}>
                     <h3 className={styles.cardTitle}>{match.title}</h3>
                     <p className={styles.cardCompany}>{match.company}</p>
+                    {(match.matched_skills && match.matched_skills.length > 0) && (
+                      <div className={styles.matchedSkills}>
+                        <span className={styles.matchedLabel}>Matched:</span>
+                        {match.matched_skills.map((s) => (
+                          <span key={s} className={styles.matchedChip}>{s}</span>
+                        ))}
+                      </div>
+                    )}
                     {match.missingSkills.length > 0 && (
                       <div className={styles.missingSkills}>
                         <span className={styles.missingLabel}>Missing:</span>
@@ -112,10 +125,15 @@ export function MatchingResultPage() {
                         ))}
                       </div>
                     )}
+                    {match.roadmap_url && (
+                      <a href={match.roadmap_url} target="_blank" rel="noopener noreferrer" className={styles.roadmapLink}>
+                        📚 Lihat Roadmap Belajar →
+                      </a>
+                    )}
                   </div>
                   <div className={styles.cardRight}>
-                    <span className={styles.score}>{Math.round(match.matchScore)}%</span>
-                    <Link to={`/lowongan/${match.internshipId}`} className={styles.detailBtn}>
+                    <span className={styles.score}>{Math.round(match.coverage_score ? match.coverage_score * 100 : match.matchScore)}%</span>
+                    <Link to={`/dashboard/lowongan/${match.internshipId}`} className={styles.detailBtn}>
                       Detail
                     </Link>
                   </div>
@@ -128,7 +146,7 @@ export function MatchingResultPage() {
         {/* Go to dashboard */}
         {!isLoading && !error && (
           <div className={styles.footerActions}>
-            <Link to="/lowongan" className={styles.browseBtn}>Lihat Semua Lowongan</Link>
+            <Link to="/dashboard/lowongan" className={styles.browseBtn}>Lihat Semua Lowongan</Link>
             <Link to="/dashboard" className={styles.dashboardBtn}>Ke Dashboard</Link>
           </div>
         )}

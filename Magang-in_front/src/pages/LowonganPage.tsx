@@ -177,52 +177,6 @@ export function LowonganPage() {
 
       {/* Main Content */}
       <div className={styles.main}>
-        {/* Sidebar */}
-        <aside className={styles.sidebar}>
-          <div className={styles.qrBanner}>
-            <div className={styles.qrIcon}></div>
-            <div>
-              <div className={styles.qrTitle}>Loker Lebih Mudah!</div>
-              <div className={styles.qrDesc}>Scan QR untuk download App</div>
-            </div>
-          </div>
-
-          <div className={styles.filterGroup}>
-            <div className={styles.filterHeader}>
-              <span>Prioritas</span>
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></svg>
-            </div>
-            <div className={styles.filterTags}>
-              <span className={styles.filterTagActive}>Paling Relevan</span>
-              <span className={styles.filterTag}>Baru</span>
-            </div>
-          </div>
-
-          <div className={styles.filterGroup}>
-            <div className={styles.filterHeader}>
-              <span>Tipe Pekerjaan</span>
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></svg>
-            </div>
-            <div className={styles.filterChecks}>
-              <label className={styles.checkItem}><input type="checkbox" defaultChecked /> Magang / Internship</label>
-              <label className={styles.checkItem}><input type="checkbox" /> Kontrak</label>
-              <label className={styles.checkItem}><input type="checkbox" /> Full-time</label>
-              <label className={styles.checkItem}><input type="checkbox" /> Freelance</label>
-            </div>
-          </div>
-
-          <div className={styles.filterGroup}>
-            <div className={styles.filterHeader}>
-              <span>Kebijakan Kerja</span>
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></svg>
-            </div>
-            <div className={styles.filterChecks}>
-              <label className={styles.checkItem}><input type="checkbox" /> Kerja di lokasi</label>
-              <label className={styles.checkItem}><input type="checkbox" defaultChecked /> Kerja Remote</label>
-              <label className={styles.checkItem}><input type="checkbox" /> Kerja Hybrid</label>
-            </div>
-          </div>
-        </aside>
 
         {/* Job Listings */}
         <section className={styles.listings}>

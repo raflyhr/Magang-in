@@ -134,6 +134,11 @@ export interface MatchResult {
   company: string
   matchScore: number
   missingSkills: string[]
+  matched_skills?: string[]
+  match_category?: string
+  roadmap_url?: string
+  coverage_score?: number
+  final_score?: number
 }
 
 export interface MatchInternshipResponse {
