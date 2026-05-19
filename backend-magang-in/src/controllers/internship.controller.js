@@ -160,6 +160,28 @@ export const getMyInternships = async (req, res) => {
   }
 };
 
+// Lihat SEMUA Pelamar di semua lowongan milik Mitra
+export const getAllMyApplicants = async (req, res) => {
+  try {
+    const mitraId = req.userId;
+
+    const applications = await prisma.application.findMany({
+      where: {
+        internship: { mitraId }
+      },
+      include: {
+        applicant: { select: { name: true, email: true, skills: { include: { skill: true } } } },
+        internship: { select: { id: true, title: true, company: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    res.json(applications);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Lihat Pelamar Pada Spesifik Lowongan
 export const getInternshipApplicants = async (req, res) => {
   try {

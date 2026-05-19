@@ -45,9 +45,36 @@ export const updateUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
-    await prisma.user.delete({ where: { id } });
+
+    await prisma.$transaction(async (tx) => {
+      // 1. Hapus semua application yang dibuat user ini (sebagai applicant)
+      await tx.application.deleteMany({ where: { userId: id } });
+
+      // 2. Hapus semua UserSkill milik user
+      await tx.userSkill.deleteMany({ where: { userId: id } });
+
+      // 3. Hapus internship milik user (sebagai mitra) beserta relasinya
+      const internships = await tx.internship.findMany({ where: { mitraId: id }, select: { id: true } });
+      const internshipIds = internships.map(i => i.id);
+
+      if (internshipIds.length > 0) {
+        // Hapus applications ke internship milik mitra ini
+        await tx.application.deleteMany({ where: { internshipId: { in: internshipIds } } });
+        await tx.internshipSkill.deleteMany({ where: { internshipId: { in: internshipIds } } });
+        await tx.roadmap.deleteMany({ where: { internshipId: { in: internshipIds } } });
+        await tx.internship.deleteMany({ where: { mitraId: id } });
+      }
+
+      // 4. Hapus artikel milik user
+      await tx.article.deleteMany({ where: { authorId: id } });
+
+      // 5. Hapus user
+      await tx.user.delete({ where: { id } });
+    });
+
     res.json({ message: 'User berhasil dihapus.' });
   } catch (error) {
+    console.error('Delete user error:', error.message);
     res.status(500).json({ message: error.message });
   }
 };

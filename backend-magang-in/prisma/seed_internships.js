@@ -1,4 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import pkg from '@prisma/client';
+const { PrismaClient } = pkg;
 import pg from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import https from 'https';
@@ -125,19 +126,13 @@ async function main() {
     console.log(`Parsed ${lines.length - 1} rows from CSV`);
 
     // 1. Create or get a system mitra user for seeding
-    let mitraUser = await prisma.user.findFirst({ where: { email: 'system-mitra@magangin.com' } });
+    let mitraUser = await prisma.user.findFirst({ where: { email: 'mitra@gmail.com' } });
     if (!mitraUser) {
-        mitraUser = await prisma.user.create({
-            data: {
-                email: 'system-mitra@magangin.com',
-                name: 'System Mitra (Seed)',
-                role: 'mitra',
-                password: null,
-                provider: 'system',
-            }
-        });
-        console.log('Created system mitra user for seeding');
+        console.error('ERROR: User mitra@gmail.com tidak ditemukan. Pastikan akun sudah terdaftar.');
+        process.exit(1);
     }
+    console.log(`Using mitra: ${mitraUser.name} (${mitraUser.email})`);
+
 
     // 2. Collect all unique skills from the dataset
     const allSkills = new Set();

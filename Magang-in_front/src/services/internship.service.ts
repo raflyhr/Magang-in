@@ -22,6 +22,10 @@ export const internshipService = {
   getApplicants: (internshipId: string) =>
     api.get<any[]>(`/internships/${internshipId}/applicants`),
 
+  // Get SEMUA pelamar di semua lowongan mitra
+  getAllMyApplicants: () =>
+    api.get<any[]>('/internships/mitra/all-applicants'),
+
   // Update status pelamar (khusus Mitra)
   updateApplicationStatus: (applicationId: string, status: 'accepted' | 'rejected') =>
     api.patch<{ message: string }>(`/internships/applications/${applicationId}`, { status }),
