@@ -11,9 +11,8 @@ export const applyInternship = async (req, res) => {
       return res.status(400).json({ message: 'Membutuhkan internshipId' });
     }
 
-    // Mockup URL penyimpanan file.
-    // Secara ideal ini ditaruh misal req.file.path setelah dikirim ke S3/Cloud.
-    const attachmentUrl = req.file ? `/uploads/cv/${req.file.originalname}` : null;
+    // Simpan path file yang di-upload
+    const attachmentUrl = req.file ? `/uploads/cv/${req.file.filename}` : null;
 
     const application = await prisma.application.create({
       data: {
@@ -47,6 +46,69 @@ export const getMyApplications = async (req, res) => {
     });
 
     res.json(applications);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Pengguna Update Lamaran (cover letter & CV) — hanya jika masih pending
+export const updateApplication = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.userId;
+    const { coverLetter } = req.body;
+
+    const application = await prisma.application.findFirst({
+      where: { id, userId }
+    });
+
+    if (!application) {
+      return res.status(404).json({ message: 'Lamaran tidak ditemukan.' });
+    }
+
+    if (application.status !== 'pending') {
+      return res.status(400).json({ message: 'Lamaran yang sudah diproses tidak bisa diedit.' });
+    }
+
+    const updateData = {};
+    if (coverLetter !== undefined) updateData.coverLetter = coverLetter;
+    if (req.file) updateData.attachmentUrl = `/uploads/cv/${req.file.filename}`;
+
+    const updated = await prisma.application.update({
+      where: { id },
+      data: updateData,
+      include: {
+        internship: { select: { title: true, company: true, location: true } }
+      }
+    });
+
+    res.json({ message: 'Lamaran berhasil diperbarui.', application: updated });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Pengguna Hapus/Batalkan Lamaran — hanya jika masih pending
+export const deleteApplication = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.userId;
+
+    const application = await prisma.application.findFirst({
+      where: { id, userId }
+    });
+
+    if (!application) {
+      return res.status(404).json({ message: 'Lamaran tidak ditemukan.' });
+    }
+
+    if (application.status !== 'pending') {
+      return res.status(400).json({ message: 'Lamaran yang sudah diproses tidak bisa dibatalkan.' });
+    }
+
+    await prisma.application.delete({ where: { id } });
+
+    res.json({ message: 'Lamaran berhasil dibatalkan.' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

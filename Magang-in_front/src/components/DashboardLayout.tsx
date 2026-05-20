@@ -53,6 +53,7 @@ export function DashboardLayout() {
     // Default Student
     return [
       { path: '/dashboard', label: 'Dashboard', icon: 'grid' },
+      { path: '/dashboard/lamaran', label: 'Lamaran Saya', icon: 'document' },
       { path: '/dashboard/lowongan', label: 'Lowongan', icon: 'briefcase' },
       { path: '/dashboard/rekomendasi', label: 'Rekomendasi AI', icon: 'sparkle' },
       { path: '/dashboard/roadmap', label: 'Roadmap', icon: 'code' },

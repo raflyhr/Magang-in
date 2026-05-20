@@ -16,6 +16,7 @@ import { SelfDeclareSkillPage } from './pages/SelfDeclareSkillPage';
 import { UploadCVPage } from './pages/UploadCVPage';
 import { MatchingResultPage } from './pages/MatchingResultPage';
 import { LowonganPage } from './pages/LowonganPage';
+import { LamaranPage } from './pages/LamaranPage';
 import { DetailLowonganPage } from './pages/DetailLowonganPage';
 import { PerusahaanPage } from './pages/PerusahaanPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -77,6 +78,7 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={['pengguna']} />}>
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/dashboard/lamaran" element={<LamaranPage />} />
             <Route path="/dashboard/lowongan" element={<LowonganPage />} />
             <Route path="/dashboard/lowongan/:id" element={<DetailLowonganPage />} />
             <Route path="/dashboard/rekomendasi" element={<MatchingResultPage />} />

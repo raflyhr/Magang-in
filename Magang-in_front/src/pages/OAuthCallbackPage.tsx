@@ -38,8 +38,19 @@ export function OAuthCallbackPage() {
           case 'admin':
             navigate('/admin/dashboard', { replace: true });
             break;
-          default:
-            navigate('/onboarding', { replace: true });
+          default: {
+            // Cek apakah user sudah punya skill (sudah onboarding)
+            try {
+              const skillRes = await import('../services/skill.service').then(m => m.skillService.getMySkills());
+              if (skillRes.data && skillRes.data.length > 0) {
+                navigate('/dashboard', { replace: true });
+              } else {
+                navigate('/onboarding', { replace: true });
+              }
+            } catch {
+              navigate('/onboarding', { replace: true });
+            }
+          }
         }
       } catch {
         // Gagal ambil profil — token invalid

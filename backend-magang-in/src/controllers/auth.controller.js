@@ -56,6 +56,7 @@ export const login = async (req, res) => {
     // Find the user
     const user = await prisma.user.findUnique({
       where: { email },
+      include: { skills: { take: 1 } },
     });
 
     if (!user || user.provider !== 'local') {
@@ -76,6 +77,7 @@ export const login = async (req, res) => {
       email: user.email,
       role: user.role,
       profileImage: user.profileImage,
+      hasCompletedOnboarding: user.skills && user.skills.length > 0,
       token: generateToken(user.id),
     });
   } catch (error) {

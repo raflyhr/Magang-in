@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { internshipService } from '../../services/internship.service';
 import type { Internship } from '../../types';
 import styles from './MitraReviewPage.module.css';
@@ -7,6 +8,7 @@ interface ApplicantData {
   id: string;
   status: string;
   coverLetter?: string;
+  attachmentUrl?: string;
   createdAt: string;
   applicant: {
     name: string;
@@ -21,10 +23,10 @@ interface ApplicantData {
 }
 
 export function MitraReviewPage() {
+  const [searchParams] = useSearchParams();
   const [internships, setInternships] = useState<Internship[]>([]);
-  const [selectedInternshipId, setSelectedInternshipId] = useState<string>('all');
-  const [allApplicants, setAllApplicants] = useState<ApplicantData[]>([]);
-  const [filteredApplicants, setFilteredApplicants] = useState<ApplicantData[]>([]);
+  const [selectedInternshipId, setSelectedInternshipId] = useState<string>(searchParams.get('internship') || 'all');
+  const [applicants, setApplicants] = useState<ApplicantData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingApplicants, setIsLoadingApplicants] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,92 +43,52 @@ export function MitraReviewPage() {
     fetchInternships();
   }, []);
 
-  // Fetch all applicants on mount
+  // Fetch applicants based on selected internship
   useEffect(() => {
-    fetchAllApplicants();
-  }, []);
+    if (isLoading) return;
 
-  const fetchAllApplicants = async () => {
-    setIsLoadingApplicants(true);
-    try {
-      const res = await internshipService.getAllMyApplicants();
-      setAllApplicants(res.data);
-    } catch {
-      setAllApplicants([]);
-    } finally {
-      setIsLoadingApplicants(false);
-    }
-  };
-
-  // Fetch per-internship applicants when dropdown changes
-  useEffect(() => {
-    if (selectedInternshipId === 'all') {
-      // Use allApplicants
-      applyFilters(allApplicants, searchQuery);
-      return;
-    }
     const fetchApplicants = async () => {
       setIsLoadingApplicants(true);
       try {
-        const res = await internshipService.getApplicants(selectedInternshipId);
-        // Add internship info to each applicant
-        const job = internships.find(i => i.id === selectedInternshipId);
-        const withInternship = res.data.map((a: any) => ({
-          ...a,
-          internship: job ? { id: job.id, title: job.title, company: job.company } : undefined
-        }));
-        applyFilters(withInternship, searchQuery);
+        if (selectedInternshipId === 'all') {
+          const res = await internshipService.getAllMyApplicants();
+          setApplicants(res.data);
+        } else {
+          const res = await internshipService.getApplicants(selectedInternshipId);
+          const job = internships.find(i => i.id === selectedInternshipId);
+          const withInternship = res.data.map((a: any) => ({
+            ...a,
+            internship: job ? { id: job.id, title: job.title, company: job.company } : undefined
+          }));
+          setApplicants(withInternship);
+        }
       } catch {
-        setFilteredApplicants([]);
+        setApplicants([]);
       } finally {
         setIsLoadingApplicants(false);
       }
     };
+
     fetchApplicants();
-  }, [selectedInternshipId, allApplicants, internships]);
+  }, [selectedInternshipId, isLoading]);
 
-  // Apply search filter
-  useEffect(() => {
-    if (selectedInternshipId === 'all') {
-      applyFilters(allApplicants, searchQuery);
-    }
-  }, [searchQuery, allApplicants]);
-
-  const applyFilters = (data: ApplicantData[], query: string) => {
-    if (!query.trim()) {
-      setFilteredApplicants(data);
-      return;
-    }
-    const q = query.toLowerCase();
-    setFilteredApplicants(data.filter(app => {
-      return (
-        (app.applicant.name || '').toLowerCase().includes(q) ||
-        (app.applicant.email || '').toLowerCase().includes(q) ||
-        (app.internship?.title || '').toLowerCase().includes(q) ||
-        (app.internship?.company || '').toLowerCase().includes(q) ||
-        app.status.toLowerCase().includes(q)
-      );
-    }));
-  };
-
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    if (selectedInternshipId !== 'all') {
-      // Re-filter current data
-      const q = value.toLowerCase();
-      if (!q) {
-        // refetch
-        setFilteredApplicants(filteredApplicants);
-      }
-    }
-  };
+  // Filter applicants by search query
+  const filteredApplicants = applicants.filter(app => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      (app.applicant.name || '').toLowerCase().includes(q) ||
+      (app.applicant.email || '').toLowerCase().includes(q) ||
+      (app.internship?.title || '').toLowerCase().includes(q) ||
+      (app.internship?.company || '').toLowerCase().includes(q) ||
+      app.status.toLowerCase().includes(q)
+    );
+  });
 
   const handleUpdateStatus = async (applicationId: string, status: 'accepted' | 'rejected') => {
     try {
       await internshipService.updateApplicationStatus(applicationId, status);
-      // Update local state
-      setAllApplicants(prev => prev.map(a => a.id === applicationId ? { ...a, status } : a));
-      setFilteredApplicants(prev => prev.map(a => a.id === applicationId ? { ...a, status } : a));
+      setApplicants(prev => prev.map(a => a.id === applicationId ? { ...a, status } : a));
     } catch {
       alert('Gagal mengubah status pelamar.');
     }
@@ -158,7 +120,7 @@ export function MitraReviewPage() {
               type="text"
               placeholder="Cari nama, email, lowongan..."
               value={searchQuery}
-              onChange={(e) => handleSearchChange(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)}
               style={{
                 flex: 1,
                 minWidth: '200px',
@@ -235,6 +197,28 @@ export function MitraReviewPage() {
                         {app.status === 'accepted' ? 'Diterima' : app.status === 'rejected' ? 'Ditolak' : 'Pending'}
                       </span>
                     </div>
+                    {app.attachmentUrl && (
+                      <a
+                        href={`${import.meta.env.VITE_API_BASE_URL?.replace('/api', '')}${app.attachmentUrl}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'inline-flex', alignItems: 'center', gap: '6px',
+                          padding: '6px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: 600,
+                          background: '#f0f9ff', color: '#0284c7', border: '1px solid #bae6fd',
+                          textDecoration: 'none', marginTop: '8px', cursor: 'pointer'
+                        }}
+                      >
+                        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                          <polyline points="14 2 14 8 20 8"/>
+                          <line x1="16" y1="13" x2="8" y2="13"/>
+                          <line x1="16" y1="17" x2="8" y2="17"/>
+                          <polyline points="10 9 9 9 8 9"/>
+                        </svg>
+                        Lihat CV
+                      </a>
+                    )}
                     {app.status === 'pending' && (
                       <div className={styles.actions}>
                         <button className={styles.tolakBtn} onClick={() => handleUpdateStatus(app.id, 'rejected')}>Tolak</button>

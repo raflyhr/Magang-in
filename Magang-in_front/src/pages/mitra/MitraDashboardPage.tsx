@@ -74,7 +74,7 @@ export function MitraDashboardPage() {
                       <div className={styles.activityMeta}>{job.location} • {job.isClosed ? 'Ditutup' : 'Aktif'}</div>
                     </div>
                   </div>
-                  <Link to="/mitra/pelamar" className={styles.reviewBtn}>Lihat Pelamar</Link>
+                  <Link to={`/mitra/pelamar?internship=${job.id}`} className={styles.reviewBtn}>Lihat Pelamar</Link>
                 </div>
               ))}
             </div>

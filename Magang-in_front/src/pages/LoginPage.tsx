@@ -16,7 +16,7 @@ export function LoginPage() {
   const { login } = useAuth();
 
   // Redirect berdasarkan role user
-  const redirectByRole = (role: string) => {
+  const redirectByRole = (role: string, hasCompletedOnboarding?: boolean) => {
     switch (role) {
       case 'mitra':
         navigate('/mitra/dashboard');
@@ -25,7 +25,11 @@ export function LoginPage() {
         navigate('/admin/dashboard');
         break;
       default:
-        navigate('/onboarding');
+        if (hasCompletedOnboarding) {
+          navigate('/dashboard');
+        } else {
+          navigate('/onboarding');
+        }
     }
   };
 
@@ -43,12 +47,12 @@ export function LoginPage() {
 
     try {
       const response = await authService.login(email, password);
-      const { token, _id, name, email: userEmail, role, profileImage } = response.data;
+      const { token, _id, name: userName, email: userEmail, role, profileImage, hasCompletedOnboarding } = response.data;
 
       // Simpan token & set user di AuthContext
       login(token, {
         id: _id,
-        name,
+        name: userName,
         email: userEmail,
         role: role as 'admin' | 'mitra' | 'pengguna',
         phone: null,
@@ -59,7 +63,7 @@ export function LoginPage() {
       });
 
       // Redirect sesuai role
-      redirectByRole(role);
+      redirectByRole(role, hasCompletedOnboarding);
     } catch (err: unknown) {
       // Tampilkan error dari backend
       if (err && typeof err === 'object' && 'response' in err) {
