@@ -15,7 +15,7 @@
 }
 
 .modal {
-  background: white;
+  background: var(--bg-card);
   border-radius: 16px;
   width: 100%;
   max-width: 500px;
@@ -41,14 +41,14 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
 }
 
 .title {
   margin: 0;
   font-size: 18px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text-dark);
 }
 
 .closeBtn {
@@ -65,7 +65,7 @@
 }
 
 .closeBtn:hover {
-  background: #f1f5f9;
+  background: var(--bg-light);
   color: #ef4444;
 }
 
@@ -86,7 +86,7 @@
 .sectionTitle {
   font-size: 14px;
   font-weight: 700;
-  color: #475569;
+  color: var(--text);
   margin: 0 0 4px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -101,7 +101,7 @@
 .label {
   font-size: 13px;
   font-weight: 600;
-  color: #334155;
+  color: var(--text-dark);
 }
 
 .input, .select, .textarea {
@@ -110,7 +110,7 @@
   border: 1px solid #cbd5e1;
   border-radius: 8px;
   font-size: 14px;
-  color: #1e293b;
+  color: var(--text-dark);
   font-family: inherit;
   transition: all 0.2s;
 }
@@ -128,19 +128,19 @@
 
 .footer {
   padding: 16px 24px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  background: #f8fafc;
+  background: var(--bg-light);
   border-radius: 0 0 16px 16px;
 }
 
 .cancelBtn {
   padding: 10px 16px;
-  background: white;
+  background: var(--bg-card);
   border: 1px solid #cbd5e1;
-  color: #475569;
+  color: var(--text);
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
@@ -149,7 +149,7 @@
 }
 
 .cancelBtn:hover {
-  background: #f1f5f9;
+  background: var(--bg-light);
 }
 
 .saveBtn {

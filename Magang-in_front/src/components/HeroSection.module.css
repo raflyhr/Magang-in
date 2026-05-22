@@ -77,7 +77,7 @@
 }
 
 .btnSecondary {
-    background: white;
+    background: var(--bg-card);
     color: var(--text-dark);
     border: 1.5px solid var(--border);
     padding: 13px 32px;

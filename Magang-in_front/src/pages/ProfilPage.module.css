@@ -27,7 +27,7 @@
 }
 
 .card {
-  background: white;
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 32px;
@@ -69,8 +69,8 @@
 
 .roleBadge {
   display: inline-block;
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--bg-light);
+  color: var(--text);
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 12px;
@@ -147,7 +147,7 @@
 }
 
 .actionCard {
-  background: white;
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 24px;
@@ -200,7 +200,7 @@
 .dangerBtn {
   display: block;
   width: 100%;
-  background: white;
+  background: var(--bg-card);
   color: #ef4444;
   border: 1px solid #fca5a5;
   padding: 10px;

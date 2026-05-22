@@ -1,6 +1,6 @@
 .page {
     min-height: 100vh;
-    background: #f8faff;
+    background: var(--bg-page);
     padding: 40px 24px;
 }
 
@@ -24,13 +24,13 @@
 .title {
     font-size: 26px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-dark);
     margin: 0 0 8px;
 }
 
 .subtitle {
     font-size: 14px;
-    color: #64748b;
+    color: var(--text);
     margin: 0 0 14px;
 }
 
@@ -57,7 +57,7 @@
     padding: 8px 20px;
     border-radius: 8px;
     font-size: 13px;
-    color: #64748b;
+    color: var(--text);
     cursor: pointer;
 }
 
@@ -70,7 +70,7 @@
 .loading {
     text-align: center;
     padding: 60px 0;
-    color: #64748b;
+    color: var(--text);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -111,7 +111,7 @@
 .empty {
     text-align: center;
     padding: 60px 0;
-    color: #64748b;
+    color: var(--text);
 }
 
 .emptySub {
@@ -130,8 +130,8 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    background: white;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
     border-left: 4px solid;
     border-radius: 12px;
     padding: 20px;
@@ -153,7 +153,7 @@
 .rank {
     font-size: 18px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-dark);
 }
 
 .badge {
@@ -171,13 +171,13 @@
 .cardTitle {
     font-size: 16px;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--text-dark);
     margin: 0 0 4px;
 }
 
 .cardCompany {
     font-size: 13px;
-    color: #64748b;
+    color: var(--text);
     margin: 0 0 8px;
 }
 
@@ -213,7 +213,7 @@
 .score {
     font-size: 28px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-dark);
 }
 
 .detailBtn {
@@ -243,7 +243,7 @@
     border: 1.5px solid #e2e8f0;
     border-radius: 10px;
     font-size: 14px;
-    color: #64748b;
+    color: var(--text);
     text-decoration: none;
 }
 
@@ -341,7 +341,7 @@
         align-items: center;
         min-width: unset;
         padding-top: 12px;
-        border-top: 1px solid #f1f5f9;
+        border-top: 1px solid var(--border);
     }
 
     .score {

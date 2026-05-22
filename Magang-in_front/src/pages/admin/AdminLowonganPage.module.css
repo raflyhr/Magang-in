@@ -25,8 +25,8 @@
 .searchInput {
   width: 100%;
   padding: 10px 16px 10px 48px;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-light);
+  border: 1px solid var(--border);
   border-radius: 12px;
   font-size: 14px;
 }
@@ -38,7 +38,7 @@
 }
 
 .adminText { text-align: right; }
-.adminName { font-size: 14px; font-weight: 700; color: #1e293b; display: block; }
+.adminName { font-size: 14px; font-weight: 700; color: var(--text-dark); display: block; }
 .adminRole { font-size: 10px; font-weight: 800; color: #6366f1; text-transform: uppercase; }
 
 /* Page Info */
@@ -49,8 +49,8 @@
   margin-bottom: 32px;
 }
 
-.title { font-size: 24px; font-weight: 800; color: #1e293b; margin: 0 0 4px; }
-.desc { font-size: 14px; color: #64748b; margin: 0; }
+.title { font-size: 24px; font-weight: 800; color: var(--text-dark); margin: 0 0 4px; }
+.desc { font-size: 14px; color: var(--text); margin: 0; }
 
 .headerActions {
   display: flex;
@@ -58,13 +58,13 @@
 }
 
 .exportBtn {
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   padding: 10px 20px;
   border-radius: 10px;
   font-size: 13px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text-dark);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -138,10 +138,10 @@
 }
 
 .statCard {
-  background: white;
+  background: var(--bg-card);
   padding: 24px;
   border-radius: 20px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
 }
 
 .statHeader {
@@ -164,7 +164,7 @@
 .statPercentRed { color: #ef4444; background: #fef2f2; padding: 2px 8px; border-radius: 6px; }
 
 .statLabel { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; display: block; }
-.statValue { font-size: 24px; font-weight: 800; color: #1e293b; }
+.statValue { font-size: 24px; font-weight: 800; color: var(--text-dark); }
 
 /* Filter Bar */
 .filterBar {
@@ -174,13 +174,13 @@
 }
 
 .selectFilter {
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   padding: 10px 16px;
   border-radius: 12px;
   font-size: 13px;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-dark);
   min-width: 200px;
   display: flex;
   align-items: center;
@@ -189,28 +189,28 @@
 
 /* Table Card */
 .tableCard {
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 20px;
   overflow: hidden;
 }
 
 .table { width: 100%; border-collapse: collapse; }
-.table th { text-align: left; padding: 16px 24px; background: #f8fafc; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; }
-.table td { padding: 16px 24px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+.table th { text-align: left; padding: 16px 24px; background: var(--bg-light); font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+.table td { padding: 16px 24px; border-bottom: 1px solid var(--border); font-size: 14px; }
 
 .jobTitleBox { display: flex; align-items: center; gap: 12px; }
 .jobDot { width: 8px; height: 8px; border-radius: 50%; }
-.jobMain { font-weight: 700; color: #1e293b; display: block; }
+.jobMain { font-weight: 700; color: var(--text-dark); display: block; }
 .jobTime { font-size: 12px; color: #94a3b8; }
 
 .companyCell { display: flex; align-items: center; gap: 12px; font-weight: 600; }
-.companyImg { width: 32px; height: 32px; border-radius: 8px; object-fit: cover; background: #f1f5f9; }
+.companyImg { width: 32px; height: 32px; border-radius: 8px; object-fit: cover; background: var(--bg-light); }
 
 .badge { display: flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
 .badgeTerlapor { background: #fee2e2; color: #ef4444; }
 .badgeTerbuka { background: #eef2ff; color: #6366f1; }
-.badgeDitutup { background: #f1f5f9; color: #64748b; }
+.badgeDitutup { background: var(--bg-light); color: var(--text); }
 
 .actionBtns { display: flex; gap: 16px; color: #6366f1; }
 .actionIcon { cursor: pointer; }
@@ -219,7 +219,7 @@
 /* Pagination */
 .pagination { display: flex; justify-content: space-between; align-items: center; padding: 24px; }
 .pageNav { display: flex; gap: 8px; align-items: center; }
-.pageBtn { width: 32px; height: 32px; border: 1px solid #e2e8f0; border-radius: 8px; background: white; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.pageBtn { width: 32px; height: 32px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-card); font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .pageBtnActive { background: #3730a3; color: white; border-color: #3730a3; }
 
 @media (max-width: 1024px) {
@@ -240,8 +240,8 @@
   /* Table to Card Pattern */
   .table, .table thead, .table tbody, .table tr, .table th, .table td { display: block; }
   .table thead { display: none; }
-  .table tr { padding: 16px; border-bottom: 1px solid #e2e8f0; }
-  .table td { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
+  .table tr { padding: 16px; border-bottom: 1px solid var(--border); }
+  .table td { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
   .table td:last-child { border-bottom: none; }
   .pagination { flex-direction: column; gap: 16px; }
 }

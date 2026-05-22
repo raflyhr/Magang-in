@@ -23,7 +23,7 @@
 .loading, .error, .empty {
   text-align: center;
   padding: 64px 24px;
-  background: white;
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 16px;
 }
@@ -66,7 +66,7 @@
 }
 
 .retryBtn {
-  background: white;
+  background: var(--bg-card);
   border: 1px solid var(--border);
   padding: 8px 16px;
   border-radius: 8px;
@@ -81,7 +81,7 @@
 }
 
 .card {
-  background: white;
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 24px;
@@ -112,7 +112,7 @@
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: #f1f5f9;
+  background: var(--bg-light);
   display: flex;
   align-items: center;
   justify-content: center;
