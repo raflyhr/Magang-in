@@ -29,6 +29,16 @@ export function Navbar() {
     }
   };
 
+  // Profile URL berdasarkan role
+  const getProfileUrl = () => {
+    if (!user) return '/dashboard/profil';
+    switch (user.role) {
+      case 'mitra': return '/mitra/profil';
+      case 'admin': return '/admin/dashboard'; // Admin tidak ada halaman profil khusus
+      default: return '/dashboard/profil';
+    }
+  };
+
   return (
     <nav className={styles.navbar}>
       <div className={styles.container}>
@@ -119,9 +129,11 @@ export function Navbar() {
                       <Link to={getDashboardUrl()} className={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
                         Dashboard
                       </Link>
-                      <Link to="/profile" className={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
-                        Profile
-                      </Link>
+                      {user.role !== 'admin' && (
+                        <Link to={getProfileUrl()} className={styles.dropdownItem} onClick={() => setDropdownOpen(false)}>
+                          Profile
+                        </Link>
+                      )}
                       <div className={styles.dropdownDivider} />
                       <button className={styles.dropdownItemDanger} onClick={logout}>
                         Logout
@@ -189,13 +201,15 @@ export function Navbar() {
             >
               Dashboard
             </Link>
-            <Link
-              to="/profile"
-              className={styles.mobileNavLink}
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Profile
-            </Link>
+            {user.role !== 'admin' && (
+              <Link
+                to={getProfileUrl()}
+                className={styles.mobileNavLink}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Profile
+              </Link>
+            )}
           </>
         )}
         {!isAuthenticated && (
