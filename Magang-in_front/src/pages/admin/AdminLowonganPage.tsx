@@ -96,7 +96,7 @@ export function AdminLowonganPage() {
                   <td>
                     <button
                       onClick={() => handleToggle(job.id, job.isClosed)}
-                      style={{ background: 'none', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer', fontSize: '12px' }}
+                      style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer', fontSize: '12px', color: 'var(--text-dark)' }}
                     >
                       {job.isClosed ? 'Buka Kembali' : 'Tutup'}
                     </button>

@@ -393,6 +393,7 @@
 
 .roleStudent { background: #eef2ff; color: #6366f1; }
 .roleMitra { background: #f0f9ff; color: #0ea5e9; }
+.roleAdmin { background: #f1f5f9; color: #475569; }
 
 .statusBadge {
   display: flex;

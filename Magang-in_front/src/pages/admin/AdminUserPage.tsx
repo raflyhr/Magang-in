@@ -175,7 +175,7 @@ export function AdminUserPage() {
                 <tr key={user.id}>
                   <td>
                     <div className={styles.userCell}>
-                      <div className={styles.avatar} style={{ background: user.role === 'admin' ? '#1e293b' : user.role === 'mitra' ? '#0ea5e9' : '#6366f1', color: 'white', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px' }}>
+                      <div className={styles.avatar} style={{ background: user.role === 'admin' ? '#475569' : user.role === 'mitra' ? '#0ea5e9' : '#6366f1', color: 'white', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px' }}>
                         {user.name?.charAt(0).toUpperCase() || '?'}
                       </div>
                       <div>
