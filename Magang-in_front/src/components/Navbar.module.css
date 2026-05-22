@@ -2,9 +2,10 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background: #ffffff;
+    background: var(--bg-page);
     border-bottom: 1px solid var(--border);
     padding: 0 16px;
+    transition: background-color 0.3s;
 }
 
 .container {
@@ -105,10 +106,28 @@
     color: var(--text-dark);
 }
 
+.themeToggle {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.themeToggle:hover {
+    background: var(--bg-light);
+    color: var(--primary);
+}
+
 .loginBtn {
     display: flex;
     align-items: center;
-    background: white;
+    background: var(--bg-card);
     color: var(--text-dark);
     border: 1.5px solid var(--border);
     padding: 7px 18px;
@@ -200,7 +219,7 @@
     top: 60px;
     left: 0;
     right: 0;
-    background: #ffffff;
+    background: var(--bg-card);
     border-bottom: 1px solid var(--border);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     padding: 8px 0;
@@ -282,7 +301,7 @@
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
-    background: white;
+    background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);

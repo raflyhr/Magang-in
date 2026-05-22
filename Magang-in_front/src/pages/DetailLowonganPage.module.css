@@ -13,7 +13,7 @@
   justify-content: center;
   min-height: 50vh;
   gap: 16px;
-  color: #64748b;
+  color: var(--text);
 }
 
 .spinner {
@@ -88,14 +88,14 @@
 .title {
   font-size: 28px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text-dark);
   margin: 0;
   line-height: 1.2;
 }
 
 .company {
   font-size: 14px;
-  color: #64748b;
+  color: var(--text);
   margin: 0;
 }
 
@@ -146,8 +146,8 @@
 
 /* Cards */
 .card {
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 24px;
   margin-bottom: 20px;
@@ -156,14 +156,14 @@
 .sectionTitle {
   font-size: 18px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text-dark);
   margin: 0 0 16px;
 }
 
 .description {
   font-size: 14px;
   line-height: 1.7;
-  color: #475569;
+  color: var(--text);
   margin: 0;
 }
 
@@ -182,7 +182,7 @@
   align-items: flex-start;
   gap: 10px;
   font-size: 14px;
-  color: #475569;
+  color: var(--text);
   line-height: 1.5;
 }
 
@@ -203,7 +203,7 @@
   align-items: center;
   gap: 10px;
   font-size: 14px;
-  color: #475569;
+  color: var(--text);
 }
 
 /* Roadmap */
@@ -249,7 +249,7 @@
 .roadmapTitle {
   font-size: 14px;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-dark);
 }
 
 .roadmapLink {
@@ -278,8 +278,8 @@
 
 /* Info Card */
 .infoCard {
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 20px;
   display: flex;
@@ -292,7 +292,7 @@
   flex-direction: column;
   gap: 2px;
   padding-bottom: 14px;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border);
 }
 
 .infoItem:last-child {
@@ -311,13 +311,13 @@
 .infoValue {
   font-size: 15px;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-dark);
 }
 
 /* Skills Card */
 .skillsCard {
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 20px;
 }
@@ -325,7 +325,7 @@
 .skillsTitle {
   font-size: 16px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text-dark);
   margin: 0 0 14px;
 }
 
@@ -340,7 +340,7 @@
   border-radius: 20px;
   font-size: 13px;
   font-weight: 500;
-  background: white;
+  background: var(--bg-card);
   color: #6366f1;
   border: 1.5px solid #c7d2fe;
 }
@@ -390,7 +390,7 @@
 }
 
 .modal {
-  background: white;
+  background: var(--bg-card);
   border-radius: 20px;
   width: 100%;
   max-width: 500px;
@@ -418,13 +418,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
 }
 
 .modalTitle {
   font-size: 18px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text-dark);
   margin: 0;
 }
 
@@ -444,7 +444,7 @@
 }
 
 .modalClose:hover {
-  background: #f1f5f9;
+  background: var(--bg-light);
   color: #ef4444;
 }
 
@@ -458,12 +458,12 @@
 
 .modalJobTitle {
   font-size: 14px;
-  color: #64748b;
+  color: var(--text);
   margin: 0;
   padding: 12px 16px;
-  background: #f8fafc;
+  background: var(--bg-light);
   border-radius: 10px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
 }
 
 .modalField {
@@ -475,7 +475,7 @@
 .modalLabel {
   font-size: 13px;
   font-weight: 600;
-  color: #475569;
+  color: var(--text);
 }
 
 .uploadArea {
@@ -506,7 +506,7 @@
   align-items: center;
   gap: 10px;
   font-size: 14px;
-  color: #1e293b;
+  color: var(--text-dark);
   font-weight: 500;
 }
 
@@ -532,7 +532,7 @@
   border-radius: 10px;
   font-size: 14px;
   font-family: inherit;
-  color: #1e293b;
+  color: var(--text-dark);
   resize: vertical;
   min-height: 100px;
   transition: border-color 0.2s;
@@ -572,26 +572,26 @@
   display: flex;
   gap: 12px;
   padding: 16px 24px;
-  border-top: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border-top: 1px solid var(--border);
+  background: var(--bg-light);
   border-radius: 0 0 20px 20px;
 }
 
 .modalCancelBtn {
   flex: 1;
   padding: 12px;
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
-  color: #64748b;
+  color: var(--text);
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .modalCancelBtn:hover {
-  background: #f1f5f9;
+  background: var(--bg-light);
 }
 
 .modalSubmitBtn {

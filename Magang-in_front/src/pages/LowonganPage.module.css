@@ -1,12 +1,12 @@
 .page {
-    background: #f8fafc;
+    background: var(--bg-light);
     min-height: 100vh;
 }
 
 /* Navbar */
 .navbar {
-    background: white;
-    border-bottom: 1px solid #e2e8f0;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
     padding: 0 24px;
     position: sticky;
     top: 0;
@@ -29,7 +29,7 @@
 }
 
 .logoText {
-    color: #1e293b;
+    color: var(--text-dark);
 }
 
 .logoDot {
@@ -49,7 +49,7 @@
     font-weight: 500;
     padding: 6px 12px;
     border-radius: 6px;
-    color: #64748b;
+    color: var(--text);
 }
 
 .navLinkActive {
@@ -80,8 +80,8 @@
 
 /* Search */
 .searchSection {
-    background: white;
-    border-bottom: 1px solid #e2e8f0;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
     padding: 16px 24px;
 }
 
@@ -101,7 +101,7 @@
     border: 1.5px solid #e2e8f0;
     border-radius: 8px;
     padding: 10px 14px;
-    background: white;
+    background: var(--bg-card);
 }
 
 .searchInput input {
@@ -110,7 +110,7 @@
     font-size: 14px;
     width: 100%;
     font-family: inherit;
-    color: #1e293b;
+    color: var(--text-dark);
 }
 
 .searchInput input::placeholder {
@@ -172,8 +172,8 @@
 }
 
 .filterGroup {
-    background: white;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
     border-radius: 12px;
     padding: 16px;
 }
@@ -184,7 +184,7 @@
     align-items: center;
     font-size: 14px;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--text-dark);
     margin-bottom: 12px;
 }
 
@@ -199,8 +199,8 @@
     font-size: 12px;
     padding: 4px 12px;
     border-radius: 16px;
-    border: 1px solid #e2e8f0;
-    color: #64748b;
+    border: 1px solid var(--border);
+    color: var(--text);
 }
 
 .filterTagActive {
@@ -238,13 +238,13 @@
 .listingsTitle {
     font-size: 20px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-dark);
 }
 
 .resultCount {
     font-size: 16px;
     font-weight: 400;
-    color: #64748b;
+    color: var(--text);
 }
 
 .jobGrid {
@@ -255,8 +255,8 @@
 
 /* Job Card */
 .jobCard {
-    background: white;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
     border-radius: 12px;
     padding: 20px;
     display: flex;
@@ -295,13 +295,13 @@
 .jobTitle {
     font-size: 15px;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--text-dark);
     margin: 0;
 }
 
 .jobCompany {
     font-size: 13px;
-    color: #64748b;
+    color: var(--text);
     margin: 2px 0 0;
 }
 
@@ -330,12 +330,12 @@
     display: flex;
     gap: 16px;
     font-size: 12px;
-    color: #64748b;
+    color: var(--text);
 }
 
 .jobLocation {
     font-size: 12px;
-    color: #64748b;
+    color: var(--text);
 }
 
 .jobTags {
@@ -348,9 +348,9 @@
     font-size: 11px;
     padding: 3px 8px;
     border-radius: 4px;
-    background: #f1f5f9;
-    color: #475569;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-light);
+    color: var(--text);
+    border: 1px solid var(--border);
 }
 
 .jobActions {
@@ -378,7 +378,7 @@
 
 .bookmarkBtn {
     background: none;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border);
     border-radius: 8px;
     padding: 8px;
     color: #94a3b8;
@@ -423,9 +423,9 @@
 .pageBtn {
     width: 36px;
     height: 36px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border);
     border-radius: 8px;
-    background: white;
+    background: var(--bg-card);
     font-size: 14px;
     color: #374151;
     cursor: pointer;
@@ -456,14 +456,14 @@
 
 /* CTA Banner */
 .ctaBanner {
-    background: #f1f5f9;
+    background: var(--bg-light);
     padding: 40px 24px;
 }
 
 .ctaContainer {
     max-width: 1200px;
     margin: 0 auto;
-    background: white;
+    background: var(--bg-card);
     border-radius: 16px;
     padding: 28px 36px;
     display: flex;
@@ -490,13 +490,13 @@
 .ctaText h3 {
     font-size: 18px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-dark);
     margin: 0 0 4px;
 }
 
 .ctaText p {
     font-size: 14px;
-    color: #64748b;
+    color: var(--text);
     margin: 0;
 }
 
@@ -537,8 +537,8 @@
 
 /* Footer */
 .footer {
-    background: white;
-    border-top: 1px solid #e2e8f0;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
     padding: 48px 24px 24px;
 }
 
@@ -563,12 +563,12 @@
 .footerLogo {
     font-size: 20px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-dark);
 }
 
 .footerBrand p {
     font-size: 13px;
-    color: #64748b;
+    color: var(--text);
     line-height: 1.6;
     margin: 0;
 }
@@ -580,7 +580,7 @@
 }
 
 .footerSocials a {
-    color: #64748b;
+    color: var(--text);
     transition: color 0.2s;
 }
 
@@ -597,7 +597,7 @@
 .footerLinks h4 {
     font-size: 13px;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--text-dark);
     margin: 0 0 12px;
     text-transform: uppercase;
 }
@@ -611,7 +611,7 @@
 
 .footerLinks li {
     font-size: 13px;
-    color: #64748b;
+    color: var(--text);
     cursor: pointer;
     transition: color 0.2s;
 }
@@ -621,7 +621,7 @@
 }
 
 .footerBottom {
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border);
     padding-top: 20px;
     font-size: 12px;
     color: #94a3b8;

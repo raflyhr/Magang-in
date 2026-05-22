@@ -14,7 +14,7 @@
   align-items: center;
   gap: 8px;
   font-size: 14px;
-  color: #64748b;
+  color: var(--text);
 }
 
 .breadcrumbActive {
@@ -36,14 +36,14 @@
   padding: 8px 16px;
   border-radius: 12px;
   font-size: 13px;
-  color: #1e293b;
+  color: var(--text-dark);
   font-weight: 600;
 }
 
 .iconBtn {
   background: none;
   border: none;
-  color: #64748b;
+  color: var(--text);
   cursor: pointer;
 }
 
@@ -56,10 +56,10 @@
 }
 
 .statCard {
-  background: white;
+  background: var(--bg-card);
   padding: 24px;
   border-radius: 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -81,7 +81,7 @@
 .statValue {
   font-size: 24px;
   font-weight: 800;
-  color: #1e293b;
+  color: var(--text-dark);
   margin-bottom: 4px;
 }
 
@@ -111,10 +111,10 @@
 }
 
 .section {
-  background: white;
+  background: var(--bg-card);
   padding: 24px;
   border-radius: 20px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
 }
 
 .sectionHeader {
@@ -127,7 +127,7 @@
 .sectionTitle {
   font-size: 18px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text-dark);
   margin: 0;
 }
 
@@ -151,12 +151,12 @@
   color: #94a3b8;
   padding: 12px;
   text-transform: uppercase;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border);
 }
 
 .table td {
   padding: 16px 12px;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border);
   font-size: 14px;
 }
 
@@ -170,7 +170,7 @@
   width: 32px;
   height: 32px;
   border-radius: 6px;
-  background: #f1f5f9;
+  background: var(--bg-light);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -246,12 +246,12 @@
 
 .logContent {
   font-size: 14px;
-  color: #475569;
+  color: var(--text);
   line-height: 1.5;
 }
 
 .logContent b {
-  color: #1e293b;
+  color: var(--text-dark);
   font-weight: 700;
 }
 
@@ -266,7 +266,7 @@
   width: 100%;
   margin-top: 24px;
   padding: 12px;
-  background: #f8fafc;
+  background: var(--bg-light);
   border: none;
   border-radius: 12px;
   font-size: 13px;
@@ -306,7 +306,7 @@
     background: none;
     padding: 0;
     font-size: 12px;
-    color: #64748b;
+    color: var(--text);
   }
 
   .statsGrid {
@@ -326,7 +326,7 @@
   /* Table to Card */
   .table, .table thead, .table tbody, .table tr, .table th, .table td { display: block; }
   .table thead { display: none; }
-  .table tr { padding: 16px 0; border-bottom: 1px solid #f1f5f9; }
+  .table tr { padding: 16px 0; border-bottom: 1px solid var(--border); }
   .table td { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
   .table td::before { content: attr(data-label); font-weight: 700; color: #94a3b8; font-size: 11px; text-transform: uppercase; }
 

@@ -25,8 +25,8 @@
 .searchInput {
   width: 100%;
   padding: 12px 16px 12px 48px;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-light);
+  border: 1px solid var(--border);
   border-radius: 12px;
   font-size: 14px;
 }
@@ -51,7 +51,7 @@
   display: block;
   font-size: 14px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text-dark);
 }
 
 .adminRole {
@@ -73,13 +73,13 @@
 .pageTitle {
   font-size: 28px;
   font-weight: 800;
-  color: #1e293b;
+  color: var(--text-dark);
   margin: 0 0 4px;
 }
 
 .pageSub {
   font-size: 14px;
-  color: #64748b;
+  color: var(--text);
   margin: 0;
 }
 
@@ -106,10 +106,10 @@
 }
 
 .statCard {
-  background: white;
+  background: var(--bg-card);
   padding: 24px;
   border-radius: 20px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   position: relative;
 }
 
@@ -147,7 +147,7 @@
 .statValue {
   font-size: 24px;
   font-weight: 800;
-  color: #1e293b;
+  color: var(--text-dark);
 }
 
 /* Table Controls */
@@ -160,7 +160,7 @@
 
 .tabs {
   display: flex;
-  background: #f1f5f9;
+  background: var(--bg-light);
   padding: 4px;
   border-radius: 10px;
   gap: 4px;
@@ -171,7 +171,7 @@
   border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
-  color: #64748b;
+  color: var(--text);
   cursor: pointer;
   border: none;
   background: none;
@@ -193,10 +193,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  color: #64748b;
+  color: var(--text);
   cursor: pointer;
 }
 
@@ -328,8 +328,8 @@
 
 /* Table Card */
 .tableCard {
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 20px;
   overflow: hidden;
   margin-bottom: 32px;
@@ -342,18 +342,18 @@
 
 .table th {
   text-align: left;
-  background: #f8fafc;
+  background: var(--bg-light);
   padding: 16px 24px;
   font-size: 12px;
   font-weight: 700;
   color: #94a3b8;
   text-transform: uppercase;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
 }
 
 .table td {
   padding: 16px 24px;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border);
   font-size: 14px;
 }
 
@@ -373,7 +373,7 @@
 .userName {
   display: block;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text-dark);
 }
 
 .userEmail {
@@ -399,7 +399,7 @@
   align-items: center;
   gap: 8px;
   font-weight: 600;
-  color: #475569;
+  color: var(--text);
 }
 
 .statusDot {
@@ -421,7 +421,7 @@
 
 .pageInfo {
   font-size: 13px;
-  color: #64748b;
+  color: var(--text);
 }
 
 .pageControls {
@@ -436,8 +436,8 @@
   align-items: center;
   justify-content: center;
   border-radius: 6px;
-  border: 1px solid #e2e8f0;
-  background: white;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -481,13 +481,13 @@
   display: block;
   font-size: 15px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text-dark);
   margin-bottom: 6px;
 }
 
 .insightText {
   font-size: 13px;
-  color: #475569;
+  color: var(--text);
   line-height: 1.6;
 }
 
@@ -510,9 +510,9 @@
   /* Table to Card Pattern */
   .table, .table thead, .table tbody, .table tr, .table th, .table td { display: block; }
   .table thead { display: none; }
-  .table tr { padding: 16px; border-bottom: 1px solid #e2e8f0; }
-  .table td { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; text-align: right; }
-  .table td::before { content: attr(data-label); font-weight: 700; color: #64748b; font-size: 12px; text-transform: uppercase; margin-right: 16px; text-align: left; }
+  .table tr { padding: 16px; border-bottom: 1px solid var(--border); }
+  .table td { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); text-align: right; }
+  .table td::before { content: attr(data-label); font-weight: 700; color: var(--text); font-size: 12px; text-transform: uppercase; margin-right: 16px; text-align: left; }
   .table td:last-child { border-bottom: none; }
   .userCell { flex-direction: row; text-align: right; }
   .pagination { flex-direction: column; gap: 16px; text-align: center; }

@@ -12,7 +12,7 @@
 .title {
   font-size: 24px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text-dark);
   margin: 0;
 }
 
@@ -25,7 +25,7 @@
 .iconBtn {
   background: none;
   border: none;
-  color: #64748b;
+  color: var(--text);
   cursor: pointer;
   position: relative;
 }
@@ -51,13 +51,13 @@
 .subtitle {
   font-size: 20px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text-dark);
   margin: 0 0 4px;
 }
 
 .desc {
   font-size: 14px;
-  color: #64748b;
+  color: var(--text);
   margin: 0;
 }
 
@@ -84,10 +84,10 @@
 }
 
 .statCard {
-  background: white;
+  background: var(--bg-card);
   padding: 24px;
   border-radius: 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-left: 4px solid #6366f1;
 }
 
@@ -104,13 +104,13 @@
 .statValue {
   font-size: 36px;
   font-weight: 800;
-  color: #1e293b;
+  color: var(--text-dark);
 }
 
 /* Table Card */
 .tableCard {
-  background: white;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 16px;
   overflow: hidden;
   margin-bottom: 24px;
@@ -123,17 +123,17 @@
 
 .table th {
   text-align: left;
-  background: #f8fafc;
+  background: var(--bg-light);
   padding: 16px 24px;
   font-size: 13px;
   font-weight: 600;
-  color: #64748b;
-  border-bottom: 1px solid #e2e8f0;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
 }
 
 .table td {
   padding: 16px 24px;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border);
   vertical-align: center;
 }
 
@@ -156,23 +156,23 @@
   display: block;
   font-size: 14px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text-dark);
 }
 
 .jobMeta {
   font-size: 12px;
-  color: #64748b;
+  color: var(--text);
 }
 
 .dateCell {
   font-size: 14px;
-  color: #475569;
+  color: var(--text);
 }
 
 .applicantCell {
   font-size: 15px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text-dark);
 }
 
 .newBadge {
@@ -201,8 +201,8 @@
 }
 
 .statusClosed {
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--bg-light);
+  color: var(--text);
 }
 
 .dot {
@@ -222,8 +222,8 @@
 }
 
 .actionBtn:hover {
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--bg-light);
+  color: var(--text);
 }
 
 /* Pagination */
@@ -232,13 +232,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 24px;
-  background: white;
-  border-top: 1px solid #f1f5f9;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
 }
 
 .pageInfo {
   font-size: 13px;
-  color: #64748b;
+  color: var(--text);
 }
 
 .pageControls {
@@ -253,11 +253,11 @@
   align-items: center;
   justify-content: center;
   border-radius: 6px;
-  border: 1px solid #e2e8f0;
-  background: white;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
   font-size: 13px;
   font-weight: 600;
-  color: #64748b;
+  color: var(--text);
   cursor: pointer;
 }
 
@@ -398,7 +398,7 @@
 
   .table tr {
     padding: 16px;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border);
   }
 
   .table td {
@@ -406,7 +406,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 10px 16px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--border);
   }
 
   .table td:last-child {

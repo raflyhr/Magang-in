@@ -1,12 +1,12 @@
 .page {
-    background: #f8fafc;
+    background: var(--bg-light);
     min-height: 100vh;
 }
 
 /* Navbar */
 .navbar {
-    background: white;
-    border-bottom: 1px solid #e2e8f0;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
     padding: 0 24px;
     position: sticky;
     top: 0;
@@ -46,7 +46,7 @@
     font-weight: 500;
     padding: 6px 12px;
     border-radius: 6px;
-    color: #64748b;
+    color: var(--text);
 }
 
 .navLinkActive {
@@ -64,7 +64,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: #f1f5f9;
+    background: var(--bg-light);
     border-radius: 8px;
     padding: 7px 14px;
 }
@@ -85,7 +85,7 @@
 .iconBtn {
     background: none;
     border: none;
-    color: #64748b;
+    color: var(--text);
     padding: 6px;
     border-radius: 6px;
     display: flex;
@@ -93,7 +93,7 @@
 }
 
 .iconBtn:hover {
-    background: #f1f5f9;
+    background: var(--bg-light);
 }
 
 .avatar {
@@ -154,8 +154,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    background: white;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
     border-radius: 12px;
     padding: 10px 12px 10px 16px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
@@ -204,9 +204,9 @@
     border-radius: 20px;
     font-size: 13px;
     font-weight: 500;
-    border: 1px solid #e2e8f0;
-    background: white;
-    color: #64748b;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text);
     cursor: pointer;
     transition: all 0.2s;
 }
@@ -234,8 +234,8 @@
 
 /* Company Card */
 .companyCard {
-    background: white;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
     border-radius: 14px;
     padding: 20px;
     display: flex;
@@ -284,13 +284,13 @@
 .companyName {
     font-size: 15px;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--text-dark);
     margin: 4px 0 0;
 }
 
 .companyCategory {
     font-size: 12px;
-    color: #64748b;
+    color: var(--text);
     margin: 0;
 }
 
@@ -309,7 +309,7 @@
     align-items: center;
     margin-top: 8px;
     padding-top: 10px;
-    border-top: 1px solid #f1f5f9;
+    border-top: 1px solid var(--border);
 }
 
 .jobCount {
@@ -334,9 +334,9 @@
 .pageBtn {
     width: 36px;
     height: 36px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border);
     border-radius: 8px;
-    background: white;
+    background: var(--bg-card);
     font-size: 14px;
     color: #374151;
     cursor: pointer;
@@ -358,8 +358,8 @@
 
 /* Footer */
 .footer {
-    background: white;
-    border-top: 1px solid #e2e8f0;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
     padding: 48px 24px 24px;
 }
 
@@ -389,7 +389,7 @@
 
 .footerBrand p {
     font-size: 13px;
-    color: #64748b;
+    color: var(--text);
     line-height: 1.6;
     margin: 0;
 }
@@ -401,7 +401,7 @@
 }
 
 .footerSocials a {
-    color: #64748b;
+    color: var(--text);
 }
 
 .footerLinks {
@@ -413,7 +413,7 @@
 .footerLinks h4 {
     font-size: 13px;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--text-dark);
     margin: 0 0 12px;
 }
 
@@ -427,7 +427,7 @@
 
 .footerLinks li {
     font-size: 13px;
-    color: #64748b;
+    color: var(--text);
     cursor: pointer;
 }
 
@@ -436,7 +436,7 @@
 }
 
 .footerBottom {
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border);
     padding-top: 20px;
     font-size: 12px;
     color: #94a3b8;
