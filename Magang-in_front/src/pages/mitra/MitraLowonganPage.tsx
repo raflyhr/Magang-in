@@ -148,13 +148,13 @@ export function MitraLowonganPage() {
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <button
                         onClick={() => handleToggleClose(job.id, job.isClosed)}
-                        style={{ background: 'none', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '6px 10px', cursor: 'pointer', fontSize: '12px' }}
+                        className={styles.toggleBtn}
                       >
                         {job.isClosed ? 'Buka' : 'Tutup'}
                       </button>
                       <button
                         onClick={() => handleDelete(job.id)}
-                        style={{ background: 'none', border: '1px solid #fecaca', borderRadius: '6px', padding: '6px 10px', cursor: 'pointer', fontSize: '12px', color: '#ef4444' }}
+                        className={styles.deleteBtn}
                       >
                         Hapus
                       </button>

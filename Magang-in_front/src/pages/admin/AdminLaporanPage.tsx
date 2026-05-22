@@ -1,4 +1,5 @@
 import styles from './AdminLaporanPage.module.css';
+import customInsightImg from '../../assets/assets/insight-grafik-saya.png';
 
 export function AdminLaporanPage() {
   const chartData = [
@@ -155,7 +156,16 @@ export function AdminLaporanPage() {
                </p>
             </div>
 
-            <div className={styles.visualPreview}></div>
+            <div className={styles.customImageWrapper}>
+               <img src={customInsightImg} alt="Custom Insight Visual" className={styles.customImage} />
+               <div className={styles.imageOverlay}>
+                 <div className={styles.liveStatus}>
+                   <span className={styles.liveDot}></span> LIVE STATUS
+                 </div>
+                 <h4 className={styles.overlayTitle}>Demographic Analysis</h4>
+                 <p className={styles.overlaySub}>Global distribution of users</p>
+               </div>
+            </div>
          </div>
       </div>
 
