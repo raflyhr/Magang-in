@@ -1,6 +1,115 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { internshipService } from '../../services/internship.service';
+import { skillService } from '../../services/skill.service';
+import { useAuth } from '../../contexts/AuthContext';
+import { authService } from '../../services/auth.service';
 import styles from './PostInternshipModal.module.css';
+
+// Searchable dropdown component
+function SearchableSelect({ label, options, value, onChange, placeholder, required }: {
+  label: string; options: string[]; value: string; onChange: (v: string) => void; placeholder?: string; required?: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setIsOpen(false); };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const filtered = options.filter(o => o.toLowerCase().includes(search.toLowerCase()));
+
+  return (
+    <div className={styles.formGroup} ref={ref} style={{ position: 'relative' }}>
+      <label className={styles.label}>{label}</label>
+      <input
+        type="text"
+        className={styles.input}
+        placeholder={placeholder}
+        required={required}
+        value={isOpen ? search : value}
+        onFocus={() => { setIsOpen(true); setSearch(value); }}
+        onChange={e => { setSearch(e.target.value); setIsOpen(true); }}
+      />
+      {isOpen && filtered.length > 0 && (
+        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', maxHeight: '180px', overflowY: 'auto', marginTop: '4px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
+          {filtered.slice(0, 20).map(opt => (
+            <div
+              key={opt}
+              onClick={() => { onChange(opt); setSearch(opt); setIsOpen(false); }}
+              style={{ padding: '8px 12px', fontSize: '13px', cursor: 'pointer', color: 'var(--text-dark)', borderBottom: '1px solid var(--border)' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-light)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+            >
+              {opt}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Multi-select searchable for skills
+function MultiSkillSelect({ label, options, selected, onChange, placeholder }: {
+  label: string; options: string[]; selected: string[]; onChange: (v: string[]) => void; placeholder?: string;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setIsOpen(false); };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const filtered = options.filter(o => o.toLowerCase().includes(search.toLowerCase()) && !selected.includes(o));
+
+  const removeSkill = (skill: string) => onChange(selected.filter(s => s !== skill));
+  const addSkill = (skill: string) => { onChange([...selected, skill]); setSearch(''); };
+
+  return (
+    <div className={styles.formGroup} ref={ref} style={{ position: 'relative' }}>
+      <label className={styles.label}>{label}</label>
+      {selected.length > 0 && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
+          {selected.map(s => (
+            <span key={s} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 10px', background: '#eef2ff', color: '#6366f1', borderRadius: '12px', fontSize: '12px', fontWeight: 600 }}>
+              {s}
+              <span onClick={() => removeSkill(s)} style={{ cursor: 'pointer', fontWeight: 800 }}>×</span>
+            </span>
+          ))}
+        </div>
+      )}
+      <input
+        type="text"
+        className={styles.input}
+        placeholder={placeholder}
+        value={search}
+        onFocus={() => setIsOpen(true)}
+        onChange={e => { setSearch(e.target.value); setIsOpen(true); }}
+      />
+      {isOpen && filtered.length > 0 && (
+        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', maxHeight: '180px', overflowY: 'auto', marginTop: '4px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
+          {filtered.slice(0, 20).map(opt => (
+            <div
+              key={opt}
+              onClick={() => addSkill(opt)}
+              style={{ padding: '8px 12px', fontSize: '13px', cursor: 'pointer', color: 'var(--text-dark)', borderBottom: '1px solid var(--border)' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-light)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+            >
+              {opt}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 interface PostInternshipModalProps {
   isOpen: boolean;
@@ -9,6 +118,7 @@ interface PostInternshipModalProps {
 }
 
 export function PostInternshipModal({ isOpen, onClose, onSuccess }: PostInternshipModalProps) {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     company: '',
@@ -24,6 +134,33 @@ export function PostInternshipModal({ isOpen, onClose, onSuccess }: PostInternsh
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [locations, setLocations] = useState<string[]>([]);
+  const [majors, setMajors] = useState<string[]>([]);
+  const [allSkills, setAllSkills] = useState<string[]>([]);
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+
+  // Fetch master data
+  useEffect(() => {
+    if (isOpen) {
+      internshipService.getLocations().then(res => setLocations(res.data.map(l => l.name))).catch(() => {});
+      internshipService.getMajors().then(res => setMajors(res.data.map(m => m.name))).catch(() => {});
+      skillService.getAll().then(res => setAllSkills(res.data.map((s: any) => s.name))).catch(() => {});
+    }
+  }, [isOpen]);
+
+  // Auto-fill company name from profile
+  useEffect(() => {
+    if (isOpen) {
+      authService.getProfile().then(res => {
+        const profile = res.data as any;
+        const companyName = profile.companyName || profile.name || '';
+        setFormData(prev => ({ ...prev, company: companyName }));
+      }).catch(() => {
+        // Fallback to user name
+        if (user?.name) setFormData(prev => ({ ...prev, company: user.name || '' }));
+      });
+    }
+  }, [isOpen, user]);
 
   if (!isOpen) return null;
 
@@ -49,12 +186,13 @@ export function PostInternshipModal({ isOpen, onClose, onSuccess }: PostInternsh
         level: formData.level,
         major: formData.major,
         requirements: formData.requirements,
-        skillsRequired: formData.skillsRequired,
+        skillsRequired: selectedSkills.join(', '),
         benefits: formData.benefits,
       } as any);
       onSuccess?.();
       onClose();
       // Reset form
+      setSelectedSkills([]);
       setFormData({
         title: '', company: '', description: '', location: '',
         type: 'On-site', duration: '3-6 Bulan', level: 'Internship',
@@ -100,27 +238,24 @@ export function PostInternshipModal({ isOpen, onClose, onSuccess }: PostInternsh
                 <input
                   type="text"
                   className={styles.input}
-                  placeholder="Contoh: PT Tech Corp"
                   required
                   value={formData.company}
-                  onChange={e => setFormData({ ...formData, company: e.target.value })}
+                  readOnly
+                  style={{ background: 'var(--bg-light)', cursor: 'not-allowed' }}
                 />
               </div>
             </div>
 
             {/* Row 2: Location & Type */}
             <div className={styles.row}>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Lokasi *</label>
-                <input
-                  type="text"
-                  className={styles.input}
-                  placeholder="Contoh: Jakarta"
-                  required
-                  value={formData.location}
-                  onChange={e => setFormData({ ...formData, location: e.target.value })}
-                />
-              </div>
+              <SearchableSelect
+                label="Lokasi *"
+                options={locations}
+                value={formData.location}
+                onChange={v => setFormData({ ...formData, location: v })}
+                placeholder="Cari lokasi..."
+                required
+              />
               <div className={styles.formGroup}>
                 <label className={styles.label}>Tipe</label>
                 <select
@@ -169,11 +304,17 @@ export function PostInternshipModal({ isOpen, onClose, onSuccess }: PostInternsh
                   value={formData.major}
                   onChange={e => setFormData({ ...formData, major: e.target.value })}
                 >
-                  <option value="Teknik Informatika">Teknik Informatika</option>
-                  <option value="Sistem Informasi">Sistem Informasi</option>
-                  <option value="Desain Komunikasi Visual">Desain Komunikasi Visual</option>
-                  <option value="Teknik Elektro">Teknik Elektro</option>
-                  <option value="Umum">Umum (Semua Jurusan)</option>
+                  {majors.length > 0 ? majors.map(m => (
+                    <option key={m} value={m}>{m}</option>
+                  )) : (
+                    <>
+                      <option value="Teknik Informatika">Teknik Informatika</option>
+                      <option value="Sistem Informasi">Sistem Informasi</option>
+                      <option value="Desain Komunikasi Visual">Desain Komunikasi Visual</option>
+                      <option value="Teknik Elektro">Teknik Elektro</option>
+                      <option value="Umum">Umum (Semua Jurusan)</option>
+                    </>
+                  )}
                 </select>
               </div>
             </div>
@@ -191,16 +332,13 @@ export function PostInternshipModal({ isOpen, onClose, onSuccess }: PostInternsh
             </div>
 
             {/* Skills Required */}
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Skills Required (pisahkan dengan koma)</label>
-              <input
-                type="text"
-                className={styles.input}
-                placeholder="Contoh: React, JavaScript, CSS, Git"
-                value={formData.skillsRequired}
-                onChange={e => setFormData({ ...formData, skillsRequired: e.target.value })}
-              />
-            </div>
+            <MultiSkillSelect
+              label="Skills Required"
+              options={allSkills}
+              selected={selectedSkills}
+              onChange={setSelectedSkills}
+              placeholder="Cari skill..."
+            />
 
             {/* Requirements */}
             <div className={styles.formGroup}>

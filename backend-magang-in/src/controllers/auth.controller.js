@@ -99,7 +99,9 @@ export const getProfile = async (req, res) => {
       select: { 
         id: true, name: true, email: true, role: true, 
         phone: true, address: true, education: true, institution: true,
-        profileImage: true, mitraStatus: true, companyName: true
+        profileImage: true, mitraStatus: true, companyName: true,
+        companyDesc: true, companyIndustry: true, companySize: true,
+        companyWebsite: true, companyLinkedin: true, companyYear: true
       }
     });
 
@@ -113,8 +115,13 @@ export const getProfile = async (req, res) => {
 // Update User Profile
 export const updateProfile = async (req, res) => {
   try {
-    const { name, email, password, phone, address, education, institution, profileImage } = req.body;
-    const updateData = { name, email, phone, address, education, institution, profileImage };
+    const { name, email, password, phone, address, education, institution, profileImage,
+            companyName, companyDesc, companyIndustry, companySize, companyWebsite, companyLinkedin, companyYear } = req.body;
+    const updateData = { name, email, phone, address, education, institution, profileImage,
+                         companyName, companyDesc, companyIndustry, companySize, companyWebsite, companyLinkedin, companyYear };
+
+    // Remove undefined values
+    Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
 
     if (password) {
       const salt = await bcrypt.genSalt(10);
@@ -127,7 +134,9 @@ export const updateProfile = async (req, res) => {
       select: { 
         id: true, name: true, email: true, role: true,
         phone: true, address: true, education: true, institution: true,
-        profileImage: true
+        profileImage: true, mitraStatus: true, companyName: true,
+        companyDesc: true, companyIndustry: true, companySize: true,
+        companyWebsite: true, companyLinkedin: true, companyYear: true
       }
     });
 
