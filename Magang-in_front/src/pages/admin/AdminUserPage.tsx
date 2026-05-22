@@ -1,7 +1,63 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { adminService } from '../../services/admin.service';
 import type { AdminUser } from '../../types';
 import styles from './AdminUserPage.module.css';
+
+function RoleDropdown({ currentRole, onRoleChange }: { currentRole: string, onRoleChange: (role: string) => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const roles = [
+    { value: 'pengguna', label: 'Pengguna' },
+    { value: 'mitra', label: 'Mitra' },
+    { value: 'admin', label: 'Admin' }
+  ];
+
+  const selectedRole = roles.find(r => r.value === currentRole) || roles[0];
+
+  return (
+    <div className={styles.customDropdown} ref={dropdownRef}>
+      <button 
+        type="button" 
+        className={styles.dropdownTrigger}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {selectedRole.label}
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      
+      {isOpen && (
+        <div className={styles.dropdownMenu}>
+          {roles.map(role => (
+            <button
+              key={role.value}
+              type="button"
+              className={`${styles.dropdownItem} ${currentRole === role.value ? styles.dropdownItemActive : ''}`}
+              onClick={() => {
+                onRoleChange(role.value);
+                setIsOpen(false);
+              }}
+            >
+              {role.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function AdminUserPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -135,20 +191,19 @@ export function AdminUserPage() {
                   </td>
                   <td>{new Date(user.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
                   <td>
-                    <div style={{ display: 'flex', gap: '6px' }}>
-                      <select
-                        value={user.role}
-                        onChange={(e) => handleChangeRole(user.id, e.target.value)}
-                        style={{ padding: '4px 8px', borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '12px' }}
-                      >
-                        <option value="pengguna">Pengguna</option>
-                        <option value="mitra">Mitra</option>
-                        <option value="admin">Admin</option>
-                      </select>
+                    <div className={styles.actionGroup}>
+                      <RoleDropdown 
+                        currentRole={user.role} 
+                        onRoleChange={(newRole) => handleChangeRole(user.id, newRole)} 
+                      />
                       <button
                         onClick={() => handleDelete(user.id)}
-                        style={{ background: 'none', border: '1px solid #fecaca', borderRadius: '6px', padding: '4px 8px', cursor: 'pointer', fontSize: '11px', color: '#ef4444' }}
+                        className={styles.deleteBtn}
+                        title="Hapus User"
                       >
+                        <svg xmlns="http://www.w3.org/2000/svg" className={styles.deleteIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
                         Hapus
                       </button>
                     </div>

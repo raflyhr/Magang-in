@@ -10,7 +10,7 @@ interface Message {
 
 const INITIAL_MESSAGE: Message = {
   id: 'welcome',
-  text: 'Halo! 👋 Saya asisten Magang-in. Ada yang bisa saya bantu? Kamu bisa tanya seputar cara melamar, tips magang, atau navigasi platform.',
+  text: 'Halo! 👋 Saya asisten Magang-in. ada yang bisa saya bantu? Kamu bisa tanya seputar cara melamar, tips magang, atau navigasi platform.',
   sender: 'bot',
   timestamp: new Date(),
 };

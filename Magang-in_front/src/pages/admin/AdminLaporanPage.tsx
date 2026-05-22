@@ -160,7 +160,7 @@ export function AdminLaporanPage() {
       </div>
 
       <div style={{ textAlign: 'center', marginTop: '40px', fontSize: '12px', color: '#94a3b8' }}>
-        © 2024 Magang-in Platform. All rights reserved. Version 2.4.0-admin.
+        © 2026 Magang-in Platform. All rights reserved.
       </div>
     </div>
   );
