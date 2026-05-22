@@ -1,7 +1,8 @@
 import express from 'express';
 import {
     getAllUsers, updateUser, deleteUser,
-    getPendingMitra, getAdminStats, getAllInternshipsAdmin, toggleInternshipStatus,
+    getPendingMitra, approveMitra, rejectMitra,
+    getAdminStats, getAllInternshipsAdmin, toggleInternshipStatus,
     createArticle, deleteArticle
 } from '../controllers/admin.controller.js';
 import { verifyToken } from '../middleware/auth.middleware.js';
@@ -22,6 +23,8 @@ router.delete('/users/:id', deleteUser);
 
 // Verifikasi Mitra
 router.get('/mitra', getPendingMitra);
+router.post('/mitra/:id/approve', approveMitra);
+router.post('/mitra/:id/reject', rejectMitra);
 
 // Kelola Lowongan (admin view)
 router.get('/internships', getAllInternshipsAdmin);

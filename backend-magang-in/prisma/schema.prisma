@@ -15,6 +15,11 @@ model User {
   name      String?
   role      String   @default("pengguna") // 'admin', 'mitra', 'pengguna'
   
+  // Mitra verification
+  mitraStatus   String?  // 'pending', 'approved', 'rejected' — null = belum request
+  companyName   String?  // Nama perusahaan (diisi saat request mitra)
+  companyDesc   String?  @db.Text // Deskripsi perusahaan
+  
   phone     String?
   address   String?
   education String?  // SMK, S1, D3, D4, S2

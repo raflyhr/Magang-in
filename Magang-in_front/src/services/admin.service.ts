@@ -35,15 +35,13 @@ export const adminService = {
 
   // === MITRA VERIFICATION ===
   getPendingMitra: () =>
-    api.get<(AdminUser & { _count: { internships: number } })[]>('/admin/mitra'),
+    api.get<any[]>('/admin/mitra'),
 
-  // Approve mitra = updateUser role to 'mitra' (already mitra)
-  // Reject mitra = updateUser role back to 'pengguna'
   approveMitra: (id: string) =>
-    api.put<{ message: string }>(`/admin/users/${id}`, { role: 'mitra' }),
+    api.post<{ message: string }>(`/admin/mitra/${id}/approve`),
 
   rejectMitra: (id: string) =>
-    api.put<{ message: string }>(`/admin/users/${id}`, { role: 'pengguna' }),
+    api.post<{ message: string }>(`/admin/mitra/${id}/reject`),
 
   // === INTERNSHIP MANAGEMENT ===
   getAllInternships: () =>

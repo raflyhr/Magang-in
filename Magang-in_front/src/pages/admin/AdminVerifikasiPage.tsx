@@ -1,30 +1,49 @@
 import { useState, useEffect } from 'react';
 import { adminService } from '../../services/admin.service';
-import type { AdminUser } from '../../types';
 import styles from './AdminVerifikasiPage.module.css';
 
+interface MitraRequest {
+  id: string;
+  name: string;
+  email: string;
+  companyName: string;
+  companyDesc?: string;
+  mitraStatus: string;
+  createdAt: string;
+}
+
 export function AdminVerifikasiPage() {
-  const [mitras, setMitras] = useState<(AdminUser & { _count?: { internships: number } })[]>([]);
+  const [requests, setRequests] = useState<MitraRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchMitras = async () => {
+  const fetchRequests = async () => {
     setIsLoading(true);
     try {
       const res = await adminService.getPendingMitra();
-      setMitras(res.data);
+      setRequests(res.data);
     } catch { /* ignore */ }
     finally { setIsLoading(false); }
   };
 
-  useEffect(() => { fetchMitras(); }, []);
+  useEffect(() => { fetchRequests(); }, []);
+
+  const handleApprove = async (id: string) => {
+    if (!confirm('Setujui user ini menjadi Mitra?')) return;
+    try {
+      await adminService.approveMitra(id);
+      fetchRequests();
+    } catch {
+      alert('Gagal menyetujui mitra.');
+    }
+  };
 
   const handleReject = async (id: string) => {
-    if (!confirm('Yakin ingin menolak mitra ini? Role akan dikembalikan ke pengguna.')) return;
+    if (!confirm('Tolak request mitra ini?')) return;
     try {
       await adminService.rejectMitra(id);
-      fetchMitras();
+      fetchRequests();
     } catch {
-      alert('Gagal menolak mitra.');
+      alert('Gagal menolak request.');
     }
   };
 
@@ -33,49 +52,59 @@ export function AdminVerifikasiPage() {
       <div className={styles.headerRow}>
         <div className={styles.titleBox}>
           <h1 className={styles.title}>Verifikasi Mitra</h1>
-          <p className={styles.desc}>Kelola dan verifikasi status perusahaan mitra di platform Magang-in.</p>
+          <p className={styles.desc}>Review dan setujui request pengguna yang ingin menjadi mitra perusahaan.</p>
         </div>
       </div>
 
       {/* Tabs */}
       <div className={styles.tabs}>
         <div className={`${styles.tab} ${styles.tabActive}`}>
-          Daftar Mitra <span className={styles.countBadge}>{mitras.length}</span>
+          Request Pending <span className={styles.countBadge}>{requests.length}</span>
         </div>
       </div>
 
-      {/* Mitra List */}
+      {/* Request List */}
       {isLoading ? (
-        <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>Memuat data mitra...</div>
-      ) : mitras.length === 0 ? (
-        <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>Tidak ada mitra terdaftar.</div>
+        <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text)' }}>Memuat data...</div>
+      ) : requests.length === 0 ? (
+        <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text)' }}>
+          Tidak ada request mitra yang menunggu verifikasi.
+        </div>
       ) : (
         <div className={styles.mitraList}>
-          {mitras.map((mitra) => (
-            <div key={mitra.id} className={styles.mitraCard}>
+          {requests.map((req) => (
+            <div key={req.id} className={styles.mitraCard}>
               <div className={styles.companyInfo}>
                 <div className={styles.companyLogo} style={{ background: '#eef2ff', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '44px', height: '44px', borderRadius: '10px', fontWeight: 700, color: '#6366f1' }}>
-                  {mitra.name?.charAt(0).toUpperCase() || '?'}
+                  {req.companyName?.charAt(0).toUpperCase() || '?'}
                 </div>
                 <div>
-                  <span className={styles.companyName}>{mitra.name || 'Tanpa Nama'}</span>
-                  <span className={styles.companyLoc}>{mitra.email}</span>
+                  <span className={styles.companyName}>{req.companyName || 'Tanpa Nama Perusahaan'}</span>
+                  <span className={styles.companyLoc}>{req.name} • {req.email}</span>
                 </div>
               </div>
-              <div>
-                <span style={{ fontSize: '12px', color: '#64748b' }}>
-                  Lowongan: {mitra._count?.internships || 0}
-                </span>
+              <div style={{ flex: 1, padding: '0 16px' }}>
+                {req.companyDesc && (
+                  <p style={{ fontSize: '12px', color: 'var(--text)', margin: 0, maxWidth: '300px' }}>
+                    {req.companyDesc.length > 100 ? req.companyDesc.substring(0, 100) + '...' : req.companyDesc}
+                  </p>
+                )}
               </div>
               <div className={styles.date}>
-                {new Date(mitra.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
+                {new Date(req.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
               </div>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button
-                  onClick={() => handleReject(mitra.id)}
+                  onClick={() => handleApprove(req.id)}
+                  style={{ background: '#ecfdf5', color: '#059669', border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+                >
+                  Setujui
+                </button>
+                <button
+                  onClick={() => handleReject(req.id)}
                   style={{ background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
                 >
-                  Cabut Mitra
+                  Tolak
                 </button>
               </div>
             </div>

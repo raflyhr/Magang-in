@@ -24,4 +24,7 @@ export const authService = {
 
   logout: () =>
     api.post<{ message: string }>('/auth/logout'),
+
+  requestMitra: (companyName: string, companyDesc?: string) =>
+    api.post<{ message: string }>('/auth/request-mitra', { companyName, companyDesc }),
 }

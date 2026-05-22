@@ -6,6 +6,91 @@ import type { User, UserSkill } from '../types';
 import { EditProfilModal } from '../components/EditProfilModal';
 import styles from './ProfilPage.module.css';
 
+function MitraRequestCard({ mitraStatus }: { mitraStatus?: string | null }) {
+  const [companyName, setCompanyName] = useState('');
+  const [companyDesc, setCompanyDesc] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState('');
+
+  if (mitraStatus === 'pending') {
+    return (
+      <div className={styles.actionCard}>
+        <div className={styles.actionIcon} style={{ background: '#fffbeb', color: '#f59e0b' }}>
+          <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <h3>Request Mitra</h3>
+        <p style={{ color: '#f59e0b', fontWeight: 600 }}>Menunggu persetujuan admin...</p>
+      </div>
+    );
+  }
+
+  if (mitraStatus === 'rejected') {
+    return (
+      <div className={styles.actionCard}>
+        <div className={styles.actionIcon} style={{ background: '#fef2f2', color: '#ef4444' }}>
+          <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        </div>
+        <h3>Request Mitra Ditolak</h3>
+        <p>Request sebelumnya ditolak. Hubungi admin untuk info lebih lanjut.</p>
+      </div>
+    );
+  }
+
+  const handleSubmit = async () => {
+    if (!companyName.trim()) {
+      setMessage('Nama perusahaan wajib diisi.');
+      return;
+    }
+    setIsSubmitting(true);
+    setMessage('');
+    try {
+      const res = await authService.requestMitra(companyName, companyDesc);
+      setMessage(res.data.message);
+      setCompanyName('');
+      setCompanyDesc('');
+    } catch (err: any) {
+      setMessage(err.response?.data?.message || 'Gagal mengirim request.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className={styles.actionCard}>
+      <div className={styles.actionIcon} style={{ background: '#f0f9ff', color: '#0ea5e9' }}>
+        <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+      </div>
+      <h3>Daftar Mitra</h3>
+      <p>Daftarkan perusahaan kamu untuk bisa posting lowongan magang.</p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
+        <input
+          type="text"
+          placeholder="Nama Perusahaan"
+          value={companyName}
+          onChange={(e) => setCompanyName(e.target.value)}
+          style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13px', background: 'var(--bg-card)', color: 'var(--text-dark)' }}
+        />
+        <textarea
+          placeholder="Deskripsi singkat perusahaan (opsional)"
+          value={companyDesc}
+          onChange={(e) => setCompanyDesc(e.target.value)}
+          rows={3}
+          style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13px', resize: 'vertical', background: 'var(--bg-card)', color: 'var(--text-dark)' }}
+        />
+        <button
+          className={styles.primaryBtn}
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+          style={{ opacity: isSubmitting ? 0.7 : 1 }}
+        >
+          {isSubmitting ? 'Mengirim...' : 'Kirim Request Mitra'}
+        </button>
+        {message && <p style={{ fontSize: '12px', color: message.includes('berhasil') ? '#059669' : '#ef4444', margin: 0 }}>{message}</p>}
+      </div>
+    </div>
+  );
+}
+
 export function ProfilPage() {
   const { user: authUser, logout } = useAuth();
   const [profile, setProfile] = useState<User | null>(authUser);
@@ -131,6 +216,11 @@ export function ProfilPage() {
             <p>Perbarui informasi data diri, pendidikan, dan kontak kamu kapan saja.</p>
             <button className={styles.primaryBtn} onClick={() => setIsEditModalOpen(true)}>Edit Data Diri</button>
           </div>
+
+          {/* Request Mitra Section */}
+          {profile?.role === 'pengguna' && (
+            <MitraRequestCard mitraStatus={(profile as any)?.mitraStatus} />
+          )}
 
           <div className={styles.actionCard}>
             <div className={styles.actionIcon}>

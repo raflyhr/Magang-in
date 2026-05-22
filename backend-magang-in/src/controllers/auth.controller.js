@@ -99,7 +99,7 @@ export const getProfile = async (req, res) => {
       select: { 
         id: true, name: true, email: true, role: true, 
         phone: true, address: true, education: true, institution: true,
-        profileImage: true
+        profileImage: true, mitraStatus: true, companyName: true
       }
     });
 
@@ -137,3 +137,34 @@ export const updateProfile = async (req, res) => {
   }
 };
 
+
+// Request menjadi Mitra
+export const requestMitra = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { companyName, companyDesc } = req.body;
+
+    if (!companyName) {
+      return res.status(400).json({ message: 'Nama perusahaan wajib diisi.' });
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+
+    if (!user) return res.status(404).json({ message: 'User tidak ditemukan.' });
+    if (user.role === 'mitra') return res.status(400).json({ message: 'Anda sudah menjadi mitra.' });
+    if (user.mitraStatus === 'pending') return res.status(400).json({ message: 'Request mitra Anda sedang diproses.' });
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        mitraStatus: 'pending',
+        companyName,
+        companyDesc: companyDesc || null,
+      }
+    });
+
+    res.json({ message: 'Request mitra berhasil dikirim. Menunggu persetujuan admin.' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

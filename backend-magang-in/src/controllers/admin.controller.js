@@ -80,19 +80,57 @@ export const deleteUser = async (req, res) => {
 };
 
 // --- Mitra Verification ---
-// Get semua user yang request jadi mitra (role masih pengguna tapi sudah request)
-// Untuk sekarang: get semua user dengan role 'mitra'
+// Get semua user yang request jadi mitra (status pending)
 export const getPendingMitra = async (req, res) => {
   try {
     const mitras = await prisma.user.findMany({
-      where: { role: 'mitra' },
+      where: { mitraStatus: 'pending' },
       select: {
         id: true, email: true, name: true, role: true, provider: true, createdAt: true,
-        _count: { select: { internships: true } }
+        mitraStatus: true, companyName: true, companyDesc: true,
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { updatedAt: 'desc' }
     });
     res.json(mitras);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Approve mitra request
+export const approveMitra = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await prisma.user.findUnique({ where: { id } });
+    if (!user) return res.status(404).json({ message: 'User tidak ditemukan.' });
+    if (user.mitraStatus !== 'pending') return res.status(400).json({ message: 'User tidak memiliki request mitra pending.' });
+
+    await prisma.user.update({
+      where: { id },
+      data: { role: 'mitra', mitraStatus: 'approved' }
+    });
+
+    res.json({ message: 'Mitra berhasil disetujui.' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Reject mitra request
+export const rejectMitra = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await prisma.user.findUnique({ where: { id } });
+    if (!user) return res.status(404).json({ message: 'User tidak ditemukan.' });
+
+    await prisma.user.update({
+      where: { id },
+      data: { role: 'pengguna', mitraStatus: 'rejected' }
+    });
+
+    res.json({ message: 'Request mitra ditolak.' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

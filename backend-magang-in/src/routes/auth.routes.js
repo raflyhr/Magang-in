@@ -1,7 +1,7 @@
 import express from 'express';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
-import { register, login, logout, getProfile, updateProfile } from '../controllers/auth.controller.js';
+import { register, login, logout, getProfile, updateProfile, requestMitra } from '../controllers/auth.controller.js';
 import { verifyToken } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
@@ -37,5 +37,8 @@ router.get('/google/failure', (req, res) => {
 // Profile Routes
 router.get('/profile', verifyToken, getProfile);
 router.put('/profile', verifyToken, updateProfile);
+
+// Request Mitra
+router.post('/request-mitra', verifyToken, requestMitra);
 
 export default router;
