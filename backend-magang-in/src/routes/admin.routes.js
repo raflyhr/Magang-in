@@ -2,7 +2,9 @@ import express from 'express';
 import {
     getAllUsers, updateUser, deleteUser,
     getPendingMitra, approveMitra, rejectMitra,
-    getAdminStats, getAllInternshipsAdmin, toggleInternshipStatus,
+    getAdminStats, getRecentActivity, getUserRegistrationTrend,
+    getMonthlyGrowth, getTopIndustries, getApplicationInsights,
+    getAllInternshipsAdmin, toggleInternshipStatus,
     createArticle, deleteArticle
 } from '../controllers/admin.controller.js';
 import { verifyToken } from '../middleware/auth.middleware.js';
@@ -15,6 +17,11 @@ router.use(verifyToken, authorizeRole('admin'));
 
 // Dashboard Stats
 router.get('/stats', getAdminStats);
+router.get('/activity', getRecentActivity);
+router.get('/trend/users', getUserRegistrationTrend);
+router.get('/report/monthly-growth', getMonthlyGrowth);
+router.get('/report/top-industries', getTopIndustries);
+router.get('/report/application-insights', getApplicationInsights);
 
 // Manajemen Pengguna
 router.get('/users', getAllUsers);

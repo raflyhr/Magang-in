@@ -7,6 +7,7 @@ export interface AdminStats {
   totalInternships: number
   totalApplications: number
   pendingApplications: number
+  pendingMitraRequests?: number
 }
 
 export interface AdminInternship extends Internship {
@@ -18,6 +19,21 @@ export const adminService = {
   // === STATS ===
   getStats: () =>
     api.get<AdminStats>('/admin/stats'),
+
+  getActivity: () =>
+    api.get<{ type: string; text: string; time: string }[]>('/admin/activity'),
+
+  getUserTrend: () =>
+    api.get<{ day: string; count: number; date: string }[]>('/admin/trend/users'),
+
+  getMonthlyGrowth: () =>
+    api.get<{ month: string; newUsers: number; newInternships: number }[]>('/admin/report/monthly-growth'),
+
+  getTopIndustries: () =>
+    api.get<{ name: string; count: number; percentage: number }[]>('/admin/report/top-industries'),
+
+  getApplicationInsights: () =>
+    api.get<{ newApplicants: number; totalMatches: number; matchRate: number; totalApplications: number }>('/admin/report/application-insights'),
 
   // === USER MANAGEMENT ===
   getAllUsers: () =>

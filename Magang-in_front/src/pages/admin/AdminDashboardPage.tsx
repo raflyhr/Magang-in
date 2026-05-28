@@ -3,20 +3,84 @@ import { Link } from 'react-router-dom';
 import { adminService, type AdminStats } from '../../services/admin.service';
 import styles from './AdminDashboardPage.module.css';
 
+interface Activity {
+  type: string;
+  text: string;
+  time: string;
+}
+
+interface TrendData {
+  day: string;
+  count: number;
+  date: string;
+}
+
+interface PendingMitra {
+  id: string;
+  name: string;
+  email: string;
+  companyName?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+function timeAgo(dateStr: string): string {
+  const diff = (Date.now() - new Date(dateStr).getTime()) / 1000;
+  if (diff < 60) return 'baru saja';
+  if (diff < 3600) return `${Math.floor(diff / 60)} menit lalu`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} jam lalu`;
+  if (diff < 604800) return `${Math.floor(diff / 86400)} hari lalu`;
+  return new Date(dateStr).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function formatDate(date: Date) {
+  const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  const day = days[date.getDay()];
+  const dd = date.getDate();
+  const mm = months[date.getMonth()];
+  const hh = String(date.getHours()).padStart(2, '0');
+  const mn = String(date.getMinutes()).padStart(2, '0');
+  return `${day}, ${dd} ${mm} | ${hh}:${mn} WIB`;
+}
+
 export function AdminDashboardPage() {
   const [stats, setStats] = useState<AdminStats | null>(null);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [trend, setTrend] = useState<TrendData[]>([]);
+  const [pendingMitras, setPendingMitras] = useState<PendingMitra[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [now, setNow] = useState(new Date());
+
+  // Live clock
+  useEffect(() => {
+    const tick = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(tick);
+  }, []);
 
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchData = async () => {
       try {
-        const res = await adminService.getStats();
-        setStats(res.data);
-      } catch { /* ignore */ }
-      finally { setIsLoading(false); }
+        const [statsRes, activityRes, trendRes, mitraRes] = await Promise.allSettled([
+          adminService.getStats(),
+          adminService.getActivity(),
+          adminService.getUserTrend(),
+          adminService.getPendingMitra(),
+        ]);
+
+        if (statsRes.status === 'fulfilled') setStats(statsRes.value.data);
+        if (activityRes.status === 'fulfilled') setActivities(activityRes.value.data);
+        if (trendRes.status === 'fulfilled') setTrend(trendRes.value.data);
+        if (mitraRes.status === 'fulfilled') setPendingMitras(mitraRes.value.data.slice(0, 3));
+      } finally {
+        setIsLoading(false);
+      }
     };
-    fetchStats();
+    fetchData();
   }, []);
+
+  const maxTrend = Math.max(...trend.map(t => t.count), 1);
+  const todayIndex = trend.length - 1;
 
   return (
     <div className={styles.container}>
@@ -27,19 +91,16 @@ export function AdminDashboardPage() {
           <span className={styles.breadcrumbActive}>Beranda</span>
         </div>
         <div className={styles.topRight}>
-          <div className={styles.timeBox}>
+          <div className={styles.timeBox} style={{ background: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border)' }}>
             <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            Senin, 14 Okt | 09:42 WIB
+            {formatDate(now)}
           </div>
-          <button className={styles.iconBtn}>
-            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/><circle cx="18" cy="6" r="3" fill="#ef4444" stroke="none"/></svg>
-          </button>
         </div>
       </div>
 
       {/* Stats Grid */}
       {isLoading ? (
-        <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>Memuat statistik...</div>
+        <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text)' }}>Memuat statistik...</div>
       ) : stats && (
         <div className={styles.statsGrid}>
           <div className={styles.statCard}>
@@ -55,6 +116,9 @@ export function AdminDashboardPage() {
             <div className={styles.statInfo}>
               <span className={styles.statLabel}>MITRA AKTIF</span>
               <span className={styles.statValue}>{stats.totalMitra}</span>
+              {stats.pendingMitraRequests ? (
+                <span className={`${styles.statTrend} ${styles.statTrendWarn}`}>! {stats.pendingMitraRequests} menunggu</span>
+              ) : null}
             </div>
             <div className={styles.statIcon}>
               <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
@@ -73,10 +137,12 @@ export function AdminDashboardPage() {
             <div className={styles.statInfo}>
               <span className={styles.statLabel}>TOTAL LAMARAN</span>
               <span className={styles.statValue}>{stats.totalApplications}</span>
-              <span className={`${styles.statTrend} ${styles.statTrendWarn}`}>! {stats.pendingApplications} Perlu Tindakan</span>
+              {stats.pendingApplications > 0 && (
+                <span className={`${styles.statTrend} ${styles.statTrendWarn}`}>! {stats.pendingApplications} pending</span>
+              )}
             </div>
-            <div className={styles.statIcon} style={{ background: '#fffedd', color: '#d97706' }}>
-              <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="12" y1="22" x2="12.01" y2="22"/></svg>
+            <div className={styles.statIcon}>
+              <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
             </div>
           </div>
         </div>
@@ -101,68 +167,53 @@ export function AdminDashboardPage() {
 
       {/* Main Content Grid */}
       <div className={styles.mainGrid}>
-        {/* Verification Table */}
+        {/* Pending Mitra Verification */}
         <div className={styles.section}>
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>Daftar Tunggu Verifikasi Mitra</h2>
             <Link to="/admin/verifikasi" className={styles.seeAll}>Lihat Semua</Link>
           </div>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Nama Perusahaan</th>
-                <th>Tanggal Daftar</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td data-label="Nama Perusahaan">
-                  <div className={styles.companyInfo}>
-                    <div className={styles.companyLogo} style={{ color: '#4f46e5', background: '#e0e7ff' }}>TN</div>
-                    <div>
-                      <div style={{ fontWeight: 600, color: 'var(--text-dark)' }}>TechNova Solutions</div>
-                    </div>
-                  </div>
-                </td>
-                <td data-label="Tanggal Daftar">12 Okt 2026</td>
-                <td data-label="Aksi">
-                  <Link to="/admin/verifikasi" className={styles.cekBtn}>Cek Dokumen</Link>
-                </td>
-              </tr>
-              <tr>
-                <td data-label="Nama Perusahaan">
-                  <div className={styles.companyInfo}>
-                    <div className={styles.companyLogo} style={{ color: '#0ea5e9', background: '#e0f2fe' }}>GC</div>
-                    <div>
-                      <div style={{ fontWeight: 600, color: 'var(--text-dark)' }}>GreenCloud Inc.</div>
-                    </div>
-                  </div>
-                </td>
-                <td data-label="Tanggal Daftar">13 Okt 2026</td>
-                <td data-label="Aksi">
-                  <Link to="/admin/verifikasi" className={styles.cekBtn}>Cek Dokumen</Link>
-                </td>
-              </tr>
-              <tr>
-                <td data-label="Nama Perusahaan">
-                  <div className={styles.companyInfo}>
-                    <div className={styles.companyLogo} style={{ color: '#d97706', background: '#fef3c7' }}>SA</div>
-                    <div>
-                      <div style={{ fontWeight: 600, color: 'var(--text-dark)' }}>Synergi Analytics</div>
-                    </div>
-                  </div>
-                </td>
-                <td data-label="Tanggal Daftar">14 Okt 2026</td>
-                <td data-label="Aksi">
-                  <Link to="/admin/verifikasi" className={styles.cekBtn}>Cek Dokumen</Link>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          {pendingMitras.length === 0 ? (
+            <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text)' }}>
+              Tidak ada request mitra yang menunggu verifikasi.
+            </div>
+          ) : (
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>Nama Perusahaan</th>
+                  <th>Tanggal Daftar</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pendingMitras.map((m) => {
+                  const initial = (m.companyName || m.name || '?').charAt(0).toUpperCase();
+                  return (
+                    <tr key={m.id}>
+                      <td data-label="Nama Perusahaan">
+                        <div className={styles.companyInfo}>
+                          <div className={styles.companyLogo} style={{ color: '#4f46e5', background: '#e0e7ff' }}>{initial}</div>
+                          <div>
+                            <div style={{ fontWeight: 600, color: 'var(--text-dark)' }}>{m.companyName || m.name}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td data-label="Tanggal Daftar">
+                        {new Date(m.updatedAt || m.createdAt || '').toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
+                      </td>
+                      <td data-label="Aksi">
+                        <Link to="/admin/verifikasi" className={styles.cekBtn}>Cek Dokumen</Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
         </div>
 
-        {/* Chart Mockup */}
+        {/* User Registration Trend */}
         <div className={styles.section}>
           <div className={styles.sectionHeader}>
             <div>
@@ -171,55 +222,70 @@ export function AdminDashboardPage() {
             </div>
           </div>
           <div className={styles.chartContainer}>
-            <div className={styles.chartBar} style={{ height: '40%' }}><span className={styles.dayLabel}>Sen</span></div>
-            <div className={styles.chartBar} style={{ height: '60%' }}><span className={styles.dayLabel}>Sel</span></div>
-            <div className={styles.chartBar} style={{ height: '55%' }}><span className={styles.dayLabel}>Rab</span></div>
-            <div className={styles.chartBar} style={{ height: '80%' }}><span className={styles.dayLabel}>Kam</span></div>
-            <div className={styles.chartBar} style={{ height: '45%' }}><span className={styles.dayLabel}>Jum</span></div>
-            <div className={styles.chartBar} style={{ height: '90%' }}><span className={styles.dayLabel}>Sab</span></div>
-            <div className={`${styles.chartBar} ${styles.chartBarActive}`} style={{ height: '75%' }}><span className={styles.dayLabel} style={{ color: '#3730a3' }}>Min</span></div>
+            {trend.map((t, i) => (
+              <div
+                key={t.date}
+                className={`${styles.chartBar} ${i === todayIndex ? styles.chartBarActive : ''}`}
+                style={{ height: `${Math.max((t.count / maxTrend) * 90, 8)}%` }}
+                title={`${t.day}: ${t.count} user`}
+              >
+                <span className={styles.dayLabel}>{t.day}</span>
+                {t.count > 0 && (
+                  <span style={{ position: 'absolute', top: '-20px', left: '50%', transform: 'translateX(-50%)', fontSize: '11px', fontWeight: 700, color: 'var(--text-dark)' }}>
+                    {t.count}
+                  </span>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* System Log */}
+      {/* System Activity Log */}
       <div className={styles.section}>
-        <div className={styles.sectionHeader} style={{ marginBottom: '32px' }}>
+        <div className={styles.sectionHeader} style={{ marginBottom: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <svg width="24" height="24" fill="none" stroke="#4f46e5" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <svg width="22" height="22" fill="none" stroke="#4f46e5" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <h2 className={styles.sectionTitle}>Log Aktivitas Sistem</h2>
           </div>
         </div>
-        <div className={styles.logList}>
-          <div className={styles.logItem}>
-            <div className={styles.logIcon} style={{ background: '#eef2ff', color: '#4f46e5' }}>
-              <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            </div>
-            <div>
-              <div className={styles.logContent}>Admin Budi menyetujui verifikasi dokumen <b>TechNova Solutions</b></div>
-              <span className={styles.logTime}>2 menit yang lalu</span>
-            </div>
+        {activities.length === 0 ? (
+          <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text)' }}>Belum ada aktivitas.</div>
+        ) : (
+          <div className={styles.logList}>
+            {activities.map((act, i) => {
+              const iconColors: Record<string, { bg: string; color: string }> = {
+                user_register: { bg: '#eef2ff', color: '#4f46e5' },
+                application: { bg: '#f0f9ff', color: '#0ea5e9' },
+                internship: { bg: '#ecfdf5', color: '#059669' },
+                mitra_request: { bg: '#fef3c7', color: '#d97706' },
+              };
+              const c = iconColors[act.type] || { bg: '#eef2ff', color: '#4f46e5' };
+              return (
+                <div key={i} className={styles.logItem}>
+                  <div className={styles.logIcon} style={{ background: c.bg, color: c.color }}>
+                    {act.type === 'user_register' && (
+                      <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    )}
+                    {act.type === 'application' && (
+                      <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    )}
+                    {act.type === 'internship' && (
+                      <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                    )}
+                    {act.type === 'mitra_request' && (
+                      <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    )}
+                  </div>
+                  <div>
+                    <div className={styles.logContent}>{act.text}</div>
+                    <span className={styles.logTime}>{timeAgo(act.time)}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          <div className={styles.logItem}>
-            <div className={styles.logIcon} style={{ background: '#f0f9ff', color: '#0ea5e9' }}>
-              <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-            </div>
-            <div>
-              <div className={styles.logContent}>Sistem mempublikasikan lowongan baru dari <b>GreenCloud Inc.</b></div>
-              <span className={styles.logTime}>15 menit yang lalu</span>
-            </div>
-          </div>
-          <div className={styles.logItem}>
-            <div className={styles.logIcon} style={{ background: '#fef2f2', color: '#ef4444' }}>
-              <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            </div>
-            <div>
-              <div className={styles.logContent}>Admin Ani menolak permohonan mitra <b style={{ color: '#ef4444' }}>Startup X</b> karena dokumen tidak valid</div>
-              <span className={styles.logTime}>1 jam yang lalu</span>
-            </div>
-          </div>
-        </div>
-        <button className={styles.moreLogs}>Tampilkan Lebih Banyak Log</button>
+        )}
       </div>
     </div>
   );
